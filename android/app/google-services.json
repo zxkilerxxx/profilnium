@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "633469872201",
+    "project_id": "profilnium",
+    "storage_bucket": "profilnium.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:633469872201:android:a0c12e9c9724bb59d03798",
+        "android_client_info": {
+          "package_name": "com.sukmatech.profilnium"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8rGqfYZAPnQTzYRVNwn4ao0ONui_ttnY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
