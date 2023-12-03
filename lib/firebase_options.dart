@@ -17,24 +17,15 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -52,11 +43,39 @@ class DefaultFirebaseOptions {
     }
   }
 
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyCa9E7gXUmD_axvGwrVL8reOy49XIDh9d8',
+    appId: '1:633469872201:web:14c028376a5ca01cd03798',
+    messagingSenderId: '633469872201',
+    projectId: 'profilnium',
+    authDomain: 'profilnium.firebaseapp.com',
+    storageBucket: 'profilnium.appspot.com',
+    measurementId: 'G-60QJNESK9Q',
+  );
+
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyC8rGqfYZAPnQTzYRVNwn4ao0ONui_ttnY',
     appId: '1:633469872201:android:a0c12e9c9724bb59d03798',
     messagingSenderId: '633469872201',
     projectId: 'profilnium',
     storageBucket: 'profilnium.appspot.com',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyCoX9w5heTvy5DWhPx33ux-6LNN7oJdoPg',
+    appId: '1:633469872201:ios:ba3a27c7b88d9349d03798',
+    messagingSenderId: '633469872201',
+    projectId: 'profilnium',
+    storageBucket: 'profilnium.appspot.com',
+    iosBundleId: 'com.sukmatech.profilnium',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyCoX9w5heTvy5DWhPx33ux-6LNN7oJdoPg',
+    appId: '1:633469872201:ios:ba3a27c7b88d9349d03798',
+    messagingSenderId: '633469872201',
+    projectId: 'profilnium',
+    storageBucket: 'profilnium.appspot.com',
+    iosBundleId: 'com.sukmatech.profilnium',
   );
 }
