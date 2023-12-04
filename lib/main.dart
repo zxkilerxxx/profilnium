@@ -1,18 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:profilnium/profile_screen.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:profilnium/profile_screen.dart';
+import 'package:profilnium/menu.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized(); //code ini
-  await Firebase.initializeApp( // dan code ini
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
       options: DefaultFirebaseOptions.android,
   );
-
-  //masalahnya dari tadi di bagian sini
-
   runApp(const MyApp());
 }
 
@@ -22,8 +20,8 @@ class MyApp extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: HomePage() ,
+    return const MaterialApp(
+      home: HomePage(),
     );
   }
 }
@@ -50,7 +48,7 @@ class _HomePageState extends State<HomePage> {
           future: _initializeFirebase(),
           builder: (context, snapshot){
             if (snapshot.connectionState == ConnectionState.done){
-              return LoginScreen();
+              return const LoginScreen();
             }
             return const Center(
               child: CircularProgressIndicator(),
@@ -60,7 +58,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -165,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 User? user = await loginUsingEmailPassword(email: _emailController.text, password: _passwordController.text, context: context);
                 print(user);
                 if(user != null){
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => ProfileScreen()));
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => MenuScreen()));
                 }
               },
               child: const Text("Login",
