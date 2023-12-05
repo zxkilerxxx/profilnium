@@ -1,60 +1,70 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:profilnium/profile_screen.dart';
-import 'package:profilnium/menu.dart';
+import 'dart:async';
+import 'package:profilnium/services/firebase_auth_service.dart';
+
 import 'firebase_options.dart';
+import 'package:flutter/material.dart';
+import 'package:firedart/firedart.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:logger/logger.dart';
+import 'package:profilnium/menu.dart';
+import 'package:profilnium/services/utility_service.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.android,
-  );
-  runApp(const MyApp());
+void main() {
+  FirebaseAuth.initialize(DefaultFirebaseOptions.currentPlatform.apiKey, VolatileStore());
+  Firestore.initialize(DefaultFirebaseOptions.currentPlatform.projectId);
+  runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  
+class MyApp extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: HomePage(),
-    );
-  }
+  State<MyApp> createState() => _MyAppState();
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class _MyAppState extends State<MyApp> {
+  var logger = Logger();
+  final UtilityService _utilityService = UtilityService();
+  bool _isOnline = true;
+  Timer? timer;
 
   @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-
-  //init firebase app
-  Future<FirebaseApp> _initializeFirebase() async{
-    FirebaseApp firebaseApp = await Firebase.initializeApp();
-    return firebaseApp;
+  void initState() {
+    super.initState();
+    checkConnection();
   }
 
+  checkConnection() {
+    _utilityService.checkConnectivity().then((value) => {
+      if(value != _isOnline) {
+        setState(() {
+          _isOnline = value;
+        })
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: FutureBuilder(
-          future: _initializeFirebase(),
-          builder: (context, snapshot){
-            if (snapshot.connectionState == ConnectionState.done){
-              return const LoginScreen();
-            }
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          },
-        ),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Profilnium',
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF0080FF)),
+      ),
+      home: _isOnline? LoginScreen(): Scaffold(
+        body: Center(
+          child: Column(
+            children: [
+              LoadingAnimationWidget.staggeredDotsWave(
+                color: Theme.of(context).colorScheme.primary,
+                size: 50.0,
+              ),
+              SizedBox(height: 50),
+              Text("Tidak ada koneksi internet")
+            ]
+          )
+        )
+      )
     );
   }
 }
@@ -67,114 +77,124 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final query = Firestore.instance.collection("user");
+  FirebaseAuthService _firebaseAuthService = FirebaseAuthService();
+  Future<bool> loginUser({required String userName, required String password}) async {
+  try {
+    var querySnapshot = await query.where("username", isEqualTo: userName).get();
 
-  //login function
-  static Future<User?> loginUsingEmailPassword(
-      {required String email,
-      required String password,
-      required BuildContext context}) async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    User? user;
-    try{
-      UserCredential userCredential = await auth.signInWithEmailAndPassword(
-          email: email, password: password);
-      user = userCredential.user;
-    } on FirebaseAuthException catch (e) {
-      if (e.code ==  "user-not-found") {
-        print ("No User Found for that email");
+    for (var docSnapshot in querySnapshot) {
+      // _firebaseAuthService.signOut();
+      if (password == docSnapshot["password"].toString()) {
+        if (userName == "admin") {
+          _firebaseAuthService.signOut();
+          await _firebaseAuthService.signIn("admin@admin.com", "abcabc123");
+        } else if (userName == "user") {
+          _firebaseAuthService.signOut();
+          await _firebaseAuthService.signIn("karyawan@karyawan.com", "abcabc123");
+        }
+        return true;
+      } else {
+        print('Incorrect password');
+        return false;
       }
     }
 
-    return user;
+    return false; // User not found
+  } catch (e) {
+    print('Error: $e');
+    return false;
   }
-
+}
 
   @override
   Widget build(BuildContext context) {
-    //create the textfield controller
-    TextEditingController _emailController = TextEditingController();
-    TextEditingController _passwordController = TextEditingController();
-    return Padding(
-      padding: EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children:[
-          const Text(
-              "Aluminium Ahia",
-              style: TextStyle
-                (color: Colors.black,
-                fontSize: 28.0,
-                fontWeight: FontWeight.bold,
-              ), //textstyle
-          ), //text
-          const Text(
-            "Login to your app",
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 44.0,
-              fontWeight: FontWeight.bold,
-            ), //textstyle
-          ), //text
-          const SizedBox(
-            height: 44.0,
-          ), //sizedbox
-          TextField(
-            controller: _emailController,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              hintText: "User Email",
-              prefixIcon: Icon(Icons.mail, color: Colors.black),
-            ), //inputdecoration
-          ), //textfield
-          const SizedBox(
-            height: 26.0,
-          ),//sizedboxpassword
-          TextField(
-            controller: _passwordController,
-            obscureText: true,
-            decoration: const InputDecoration(
-              hintText: "Input Password",
-              prefixIcon: Icon(Icons.lock, color: Colors.black),
-            ),//inputdecoration
-          ),//textfieldpassword
-          const SizedBox(
-            height: 12.0,
-          ), //sizedbox
-          const Text(
-            "Lupa password?",
-            style: TextStyle(color: Colors.blue),
-          ),//text
-          const SizedBox(
-            height: 88.0,
-          ),//sizedbox
-          Container(
-            width: double.infinity,
-            child: RawMaterialButton(
-              fillColor: const Color(0xFF0069FE),
-              elevation: 0.0,
-              padding: const EdgeInsets.symmetric(vertical: 20.0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0)
-              ),//RoundedRectangleBorder
-              onPressed: () async {
-                //test the app
-                User? user = await loginUsingEmailPassword(email: _emailController.text, password: _passwordController.text, context: context);
-                print(user);
-                if(user != null){
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => MenuScreen()));
-                }
-              },
-              child: const Text("Login",
+    TextEditingController emailController = TextEditingController();
+    TextEditingController passwordController = TextEditingController();
+    return Scaffold(
+      body: Center(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children:[
+              const Text(
+                "Profilnium",
+                style: TextStyle
+                  (color: Colors.black,
+                  fontSize: 28.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Text(
+                "Login to your app",
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18.0,
-                )),//textstyle //text
-            ),//Rawmaterialbutton
-          ),//container
-        ],
-
-      ), // column
-    ); //padding
+                  color: Colors.black,
+                  fontSize: 44.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(
+                height: 44.0,
+              ),
+              TextField(
+                controller: emailController,
+                keyboardType: TextInputType.name,
+                decoration: const InputDecoration(
+                  hintText: "Username",
+                  prefixIcon: Icon(Icons.person, color: Colors.black),
+                ),
+              ),
+              const SizedBox(
+                height: 26.0,
+              ),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  hintText: "Password",
+                  prefixIcon: Icon(Icons.lock, color: Colors.black),
+                ),
+              ),
+              const SizedBox(
+                height: 12.0,
+              ),
+              const Text(
+                "Lupa password?",
+                style: TextStyle(color: Colors.blue),
+              ),
+              const SizedBox(
+                height: 88.0,
+              ),
+              Container(
+                width: double.infinity,
+                child: RawMaterialButton(
+                  fillColor: const Color(0xFF0069FE),
+                  elevation: 0.0,
+                  padding: const EdgeInsets.symmetric(vertical: 20.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0)
+                  ),
+                  onPressed: () async {
+                    if(await loginUser(userName: emailController.text, password: passwordController.text)) {
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => MenuScreen()));
+                    } else {
+                      //handle error
+                    }
+                  },
+                  child: const Text("Login",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18.0,
+                    )
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      )
+    );
   }
 }

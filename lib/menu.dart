@@ -49,54 +49,42 @@ class _MenuScreenState extends State<MenuScreen> {
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
-          return Column(
+          return Row(
             children: [
-              // AppBar(
-              //   backgroundColor: colorScheme.primary,
-              //   centerTitle: true,
-              //   title: Padding(
-              //     padding: const EdgeInsets.all(16.0),
-              //     child: Text("PROFILNIUM"),
-              //   ),
-              // ),
-              Row(
-                children: [
-                  SafeArea(
-                    child: NavigationRail(
-                      extended: true,
-                    destinations: [
-                      NavigationRailDestination(
-                        icon: Icon(Icons.home),
-                        label: Text("Home"),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.all_inbox),
-                        label: Text("Stok"),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.add_shopping_cart),
-                        label: Text("Pembelian"),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.attach_money),
-                        label: Text("Penjualan"),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.settings),
-                        label: Text("Pengaturan"),
-                      ),
-                    ],
-                    selectedIndex: selectedIndex,
-                    onDestinationSelected: (value) {
-                      setState(() {
-                        selectedIndex = value;
-                      });
-                    },
-                  ),
+              SafeArea(
+                child: NavigationRail(
+                  extended: true,
+                  destinations: [
+                    NavigationRailDestination(
+                      icon: Icon(Icons.home),
+                      label: Text("Home"),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.all_inbox),
+                      label: Text("Stok"),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.add_shopping_cart),
+                      label: Text("Pembelian"),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.attach_money),
+                      label: Text("Penjualan"),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.settings),
+                      label: Text("Pengaturan"),
+                    ),
+                  ],
+                  selectedIndex: selectedIndex,
+                  onDestinationSelected: (value) {
+                    setState(() {
+                      selectedIndex = value;
+                    });
+                  },
                 ),
-                Expanded(child: fragmentArea),
-                ],
               ),
+              Expanded(child: fragmentArea),
             ],
           );
         },
