@@ -81,6 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
   FirebaseAuthService _firebaseAuthService = FirebaseAuthService();
   Future<bool> loginUser({required String userName, required String password}) async {
   try {
+    _firebaseAuthService.signIn("aplikasi@aplikasi.com", "abcabc123");
     var querySnapshot = await query.where("username", isEqualTo: userName).get();
 
     for (var docSnapshot in querySnapshot) {
@@ -99,7 +100,6 @@ class _LoginScreenState extends State<LoginScreen> {
         return false;
       }
     }
-
     return false; // User not found
   } catch (e) {
     print('Error: $e');
