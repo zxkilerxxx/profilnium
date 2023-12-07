@@ -1,3 +1,4 @@
+import 'package:firedart/auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:profilnium/home.dart';
 import 'package:profilnium/stok.dart';
@@ -12,6 +13,12 @@ class MenuScreen extends StatefulWidget {
 
 class _MenuScreenState extends State<MenuScreen> {
   var selectedIndex = 0;
+
+  @override
+  void initState() {
+    print(FirebaseAuth.instance.userId);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

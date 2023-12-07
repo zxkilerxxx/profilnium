@@ -13,6 +13,11 @@ class _FragmentPengaturan extends State<FragmentPengaturan> {
   String message = "";
   String title = "";
 
+  void clearText() {
+    pass1.text = "";
+    pass2.text = "";
+  }
+
   Future<void> updateData({required String password}) async {
     User user = await FirebaseAuth.instance.getUser();
     await Firestore.instance
@@ -128,6 +133,7 @@ class _FragmentPengaturan extends State<FragmentPengaturan> {
                 message = "Update password gagal/password tidak sama";
                 showAlertDialog(context);
               }
+              clearText();
             }),
             child: Text("Submit",
                 style: TextStyle(

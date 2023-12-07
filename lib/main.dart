@@ -112,6 +112,34 @@ class _LoginScreenState extends State<LoginScreen> {
     _firebaseAuthService.signIn("aplikasi@aplikasi.com", "abcabc123");
     TextEditingController emailController = TextEditingController();
     TextEditingController passwordController = TextEditingController();
+
+    showAlertDialog(BuildContext context) {
+      // set up the button
+      Widget okButton = TextButton(
+        child: Text("OK"),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+      );
+
+      // set up the AlertDialog
+      AlertDialog alert = AlertDialog(
+        title: Text('Warning'),
+        content: Text('Username/password salah !'),
+        actions: [
+          okButton,
+        ],
+      );
+
+      // show the dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        },
+      );
+    }
+
     return Scaffold(
         body: Center(
       child: Padding(
@@ -183,7 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Navigator.of(context).pushReplacement(
                         MaterialPageRoute(builder: (context) => MenuScreen()));
                   } else {
-                    //handle error
+                    showAlertDialog(context);
                   }
                 },
                 child: const Text("Login",
