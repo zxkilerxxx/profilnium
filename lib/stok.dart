@@ -35,6 +35,7 @@ class _FragmentStok extends State<FragmentStok> {
                   prefixIcon: Icon(Icons.search, color: Colors.black),
                 ),
               ),
+              const SizedBox(height: 20.20),
               ElevatedButton(
                 //width: double.infinity,
                 onPressed: () {},
@@ -44,12 +45,13 @@ class _FragmentStok extends State<FragmentStok> {
                       fontSize: 12.0,
                     )),
               ),
+              const SizedBox(height: 20.20),
               DataTable(
                 columns: const <DataColumn>[
                   DataColumn(
                     label: Expanded(
                       child: Text(
-                        'Name',
+                        'Nama Produk',
                         style: TextStyle(fontStyle: FontStyle.italic),
                       ),
                     ),
@@ -57,7 +59,7 @@ class _FragmentStok extends State<FragmentStok> {
                   DataColumn(
                     label: Expanded(
                       child: Text(
-                        'Age',
+                        'Warna',
                         style: TextStyle(fontStyle: FontStyle.italic),
                       ),
                     ),
@@ -65,32 +67,47 @@ class _FragmentStok extends State<FragmentStok> {
                   DataColumn(
                     label: Expanded(
                       child: Text(
-                        'Role',
+                        'Harga Jual',
+                        style: TextStyle(fontStyle: FontStyle.italic),
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Expanded(
+                      child: Text(
+                        'Sisa Stok',
+                        style: TextStyle(fontStyle: FontStyle.italic),
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Expanded(
+                      child: Text(
+                        'Edit',
+                        style: TextStyle(fontStyle: FontStyle.italic),
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Expanded(
+                      child: Text(
+                        'Hapus',
                         style: TextStyle(fontStyle: FontStyle.italic),
                       ),
                     ),
                   ),
                 ],
-                rows: const <DataRow>[
+                rows: <DataRow>[
                   DataRow(
                     cells: <DataCell>[
-                      DataCell(Text('Sarah')),
-                      DataCell(Text('19')),
-                      DataCell(Text('Student')),
-                    ],
-                  ),
-                  DataRow(
-                    cells: <DataCell>[
-                      DataCell(Text('Janine')),
-                      DataCell(Text('43')),
-                      DataCell(Text('Professor')),
-                    ],
-                  ),
-                  DataRow(
-                    cells: <DataCell>[
-                      DataCell(Text('William')),
-                      DataCell(Text('27')),
-                      DataCell(Text('Associate Professor')),
+                      DataCell(Text('Aluminium cap badak')),
+                      DataCell(Text('putih')),
+                      DataCell(Text('20 ribu je')),
+                      DataCell(Text('kosong')),
+                      DataCell(ElevatedButton(
+                          onPressed: () {}, child: Text('edit'))),
+                      DataCell(ElevatedButton(
+                          onPressed: () {}, child: Text('hapus'))),
                     ],
                   ),
                 ],
