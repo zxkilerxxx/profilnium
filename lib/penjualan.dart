@@ -1,3 +1,5 @@
+import 'dart:js_util';
+
 import 'package:firedart/firedart.dart';
 import 'package:flutter/material.dart';
 
@@ -8,6 +10,7 @@ class FragmentPenjualan extends StatefulWidget {
 
 class Item {
 
+  
   final String nama;
   final String warna;
   int jumlah;
@@ -25,29 +28,29 @@ class Item {
 
 class _FragmentPenjualan extends State<FragmentPenjualan> {
   TextEditingController _controller = TextEditingController();
-  List<Item> items = List.generate(
-    50,
-    (index) => Item(
-      nama: 'Item $index',
-      warna: 'Data 1 for Item $index',
-      jumlah: 1,
-      harga: 0,
-      total: 0,
-    ),
-  );
+  List<Item> items = [];
+  List<String> payment = ['CASH', 'TENOR'];
   List<Item> selectedItems = [];
   List<Item> searchResults = [];
+  String? _selectedItem;
 
   @override
   void initState() {
     super.initState();
     searchResults = List.from(items);
-    _selectedItem = _items[0];
+    _selectedItem = payment[0];
   }
 
-  String? _selectedItem;
+  Future<List<Document>> getData() async {
+    return await Firestore.instance.collection("data").get();
+  }
 
-  List<String> _items = ['CASH', 'TENOR'];
+  void fetchData() async {
+    List<Document> data = await getData();
+    for (var document in data) {
+      items.add(Item(nama: document['namaProduk'], warna: document['warna'], jumlah: 1, harga: document['hargaJual'], total: 0));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -212,7 +215,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                           height: 55.0,
                                           child: DropdownButtonFormField<String>(
                                             value: _selectedItem,
-                                            items: _items.map((String value) {
+                                            items: payment.map((String value) {
                                             return DropdownMenuItem<String>(
                                               value: value, // Ensure each value is unique
                                               child: Text(value),
@@ -255,7 +258,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                       onChanged: (value) {
                                         setState(() {
                                           searchResults = items
-                                            .where((item) => item.name
+                                            .where((item) => item.nama
                                                 .toLowerCase()
                                                 .contains(value.toLowerCase()))
                                             .toList();
@@ -270,7 +273,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                       itemCount: searchResults.length,
                                       itemBuilder: (context, index) {
                                         return ListTile(
-                                          title: Text(searchResults[index].name),
+                                          title: Text(searchResults[index].nama),
                                           onTap: () {
                                             setState(() {
                                               if (selectedItems.length < 12 &&
@@ -300,6 +303,10 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                             ),
                           ],
                         ),
+                        SizedBox(
+                          width: double.infinity,
+                          child: Text('table di sini'),
+                        )
                       ],
                     ),
                   ],
