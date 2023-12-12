@@ -57,6 +57,7 @@ class _MenuScreenState extends State<MenuScreen> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           return Row(
+            mainAxisSize: MainAxisSize.max,
             children: [
               SafeArea(
                 child: NavigationRail(
