@@ -25,18 +25,27 @@ class Item {
 class _FragmentPenjualan extends State<FragmentPenjualan> {
   int total = 0;
   TextEditingController _controller = TextEditingController();
-  List<Item> items = [];
+  List<Item> items = List.generate(
+    50,
+    (index) => Item(
+      name: 'Item $index',
+      warna: 'Data 1 for Item $index',
+      jumlah: 1,
+      harga: 0,
+      total: 0,
+    ),
+  );
   List<Item> selectedItems = [];
   List<Item> searchResults = [];
   String? _selectedItem;
-  List<String> _items = ['CASH', 'TENOR'];
+  List<String> payment = ['CASH', 'TENOR'];
 
   @override
   void initState() {
     super.initState();
     fetchData();
     searchResults = List.from(items);
-    _selectedItem = _items[0];
+    _selectedItem = payment[0];
   }
 
   Future<List<Document>> getData() async {
@@ -247,7 +256,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                           child:
                                               DropdownButtonFormField<String>(
                                             value: _selectedItem,
-                                            items: _items.map((String value) {
+                                            items: payment.map((String value) {
                                               return DropdownMenuItem<String>(
                                                 value:
                                                     value, // Ensure each value is unique
