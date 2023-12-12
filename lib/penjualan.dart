@@ -7,15 +7,14 @@ class FragmentPenjualan extends StatefulWidget {
 }
 
 class Item {
-
-  final String nama;
+  final String name;
   final String warna;
   int jumlah;
   int harga;
   int total;
 
   Item({
-    required this.nama,
+    required this.name,
     required this.warna,
     required this.jumlah,
     required this.harga,
@@ -24,30 +23,41 @@ class Item {
 }
 
 class _FragmentPenjualan extends State<FragmentPenjualan> {
+  int total = 0;
   TextEditingController _controller = TextEditingController();
-  List<Item> items = List.generate(
-    50,
-    (index) => Item(
-      nama: 'Item $index',
-      warna: 'Data 1 for Item $index',
-      jumlah: 1,
-      harga: 0,
-      total: 0,
-    ),
-  );
+  List<Item> items = [];
   List<Item> selectedItems = [];
   List<Item> searchResults = [];
+  String? _selectedItem;
+  List<String> _items = ['CASH', 'TENOR'];
 
   @override
   void initState() {
     super.initState();
+    fetchData();
     searchResults = List.from(items);
     _selectedItem = _items[0];
   }
 
-  String? _selectedItem;
+  Future<List<Document>> getData() async {
+    List<Document> document = await Firestore.instance.collection('data').get();
+    return document;
+  }
 
-  List<String> _items = ['CASH', 'TENOR'];
+  Future<void> fetchData() async {
+    List<Document> database = await getData();
+    for (Document doc in database) {
+      items.add(Item(
+          name: doc['NamaProduk'],
+          warna: doc['warna'],
+          jumlah: 1,
+          harga: int.parse(doc['HargaJual']),
+          total: total));
+    }
+    setState(() {
+      searchResults = List.from(items);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,32 +75,33 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                   children: [
                     Column(
                       children: [
-                      Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Penjualan',
-                          style: TextStyle(
-                            color: Color(0xFF343A40),
-                            fontSize: 36,
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.w300,
-                            height: 0.03,
-                            letterSpacing: 3.20,
+                        Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            'Penjualan',
+                            style: TextStyle(
+                              color: Color(0xFF343A40),
+                              fontSize: 24,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w300,
+                              height: 0.03,
+                              letterSpacing: 3.10,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 47.99),
-                      Row(
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                        const SizedBox(height: 10.99),
+                        Row(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Column(
                                           children: [
@@ -102,16 +113,22 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                                 fontFamily: 'Poppins',
                                               ),
                                             ),
-                                            SizedBox(height: 10), // Adjust the height as needed
                                             SizedBox(
-                                              width: 200.0,
-                                              height: 35.0,
+                                                height:
+                                                    10), // Adjust the height as needed
+                                            SizedBox(
+                                              width: 180.0,
+                                              height: 30.0,
                                               child: TextField(
-                                                decoration: const InputDecoration(
+                                                decoration:
+                                                    const InputDecoration(
                                                   hintText: "Masukkan No Nota",
+                                                  hintStyle:
+                                                      TextStyle(fontSize: 12),
                                                   border:
                                                       OutlineInputBorder(), // Adding border for better visibility
                                                 ),
+                                                style: TextStyle(fontSize: 12),
                                               ),
                                             ),
                                           ],
@@ -129,17 +146,24 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                                 fontFamily: 'Poppins',
                                               ),
                                             ),
-                                            SizedBox(height: 10), // Adjust the height as needed
                                             SizedBox(
-                                              width: 200.0,
-                                              height: 35.0,
+                                                height:
+                                                    10), // Adjust the height as needed
+                                            SizedBox(
+                                              width: 180.0,
+                                              height: 30.0,
                                               child: TextField(
-                                                keyboardType: TextInputType.datetime,
-                                                decoration: const InputDecoration(
+                                                keyboardType:
+                                                    TextInputType.datetime,
+                                                decoration:
+                                                    const InputDecoration(
                                                   hintText: "Masukkan Tanggal",
+                                                  hintStyle:
+                                                      TextStyle(fontSize: 12),
                                                   border:
                                                       OutlineInputBorder(), // Adding border for better visibility
                                                 ),
+                                                style: TextStyle(fontSize: 12),
                                               ),
                                             ),
                                           ],
@@ -166,29 +190,37 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                             fontFamily: 'Poppins',
                                           ),
                                         ),
-                                        SizedBox(height: 10), // Adjust the height as needed
                                         SizedBox(
-                                          width: 200.0,
-                                          height: 35.0,
+                                            height:
+                                                10), // Adjust the height as needed
+                                        SizedBox(
+                                          width: 180.0,
+                                          height: 30.0,
                                           child: TextField(
                                             // controller: pass1,
                                             decoration: const InputDecoration(
                                               hintText: "Nama Pembeli",
+                                              hintStyle:
+                                                  TextStyle(fontSize: 12),
                                               border:
                                                   OutlineInputBorder(), // Adding border for better visibility
                                             ),
+                                            style: TextStyle(fontSize: 12),
                                           ),
                                         ),
                                         SizedBox(
-                                          width: 200.0,
-                                          height: 50.0,
+                                          width: 180.0,
+                                          height: 40.0,
                                           child: TextField(
                                             // controller: pass1,
                                             decoration: const InputDecoration(
                                               hintText: "Alamat Pembeli",
+                                              hintStyle:
+                                                  TextStyle(fontSize: 12),
                                               border:
-                                            OutlineInputBorder(), // Adding border for better visibility
+                                                  OutlineInputBorder(), // Adding border for better visibility
                                             ),
+                                            style: TextStyle(fontSize: 12),
                                           ),
                                         ),
                                       ],
@@ -206,17 +238,21 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                             fontFamily: 'Poppins',
                                           ),
                                         ),
-                                        SizedBox(height: 10), // Adjust the height as needed
                                         SizedBox(
-                                          width: 200.0,
+                                            height:
+                                                10), // Adjust the height as needed
+                                        SizedBox(
+                                          width: 180.0,
                                           height: 55.0,
-                                          child: DropdownButtonFormField<String>(
+                                          child:
+                                              DropdownButtonFormField<String>(
                                             value: _selectedItem,
                                             items: _items.map((String value) {
-                                            return DropdownMenuItem<String>(
-                                              value: value, // Ensure each value is unique
-                                              child: Text(value),
-                                            );
+                                              return DropdownMenuItem<String>(
+                                                value:
+                                                    value, // Ensure each value is unique
+                                                child: Text(value),
+                                              );
                                             }).toList(),
                                             onChanged: (String? newValue) {
                                               setState(() {
@@ -224,10 +260,11 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                               });
                                             },
                                             decoration: InputDecoration(
-                                              border: OutlineInputBorder(),
-                                              hintText: 'Select',
-                                              labelText: 'JENIS PEMBAYARAN',
-                                            ),
+                                                border: OutlineInputBorder(),
+                                                hintText: 'Select',
+                                                labelText: 'JENIS PEMBAYARAN',
+                                                hintStyle:
+                                                    TextStyle(fontSize: 12)),
                                           ),
                                         ),
                                       ],
@@ -255,10 +292,11 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                       onChanged: (value) {
                                         setState(() {
                                           searchResults = items
-                                            .where((item) => item.name
-                                                .toLowerCase()
-                                                .contains(value.toLowerCase()))
-                                            .toList();
+                                              .where((item) => item.name
+                                                  .toLowerCase()
+                                                  .contains(
+                                                      value.toLowerCase()))
+                                              .toList();
                                         });
                                       },
                                     ),
@@ -270,24 +308,29 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                       itemCount: searchResults.length,
                                       itemBuilder: (context, index) {
                                         return ListTile(
-                                          title: Text(searchResults[index].name),
+                                          title: Text(
+                                            '${searchResults[index].name} ${searchResults[index].warna}',
+                                          ),
                                           onTap: () {
                                             setState(() {
                                               if (selectedItems.length < 12 &&
-                                                  !selectedItems
-                                                      .contains(searchResults[index])) {
-                                                selectedItems.add(searchResults[index]);
-                                                searchResults.remove(searchResults[index]);
+                                                  !selectedItems.contains(
+                                                      searchResults[index])) {
+                                                selectedItems
+                                                    .add(searchResults[index]);
+                                                searchResults.remove(
+                                                    searchResults[index]);
                                                 _controller
                                                     .clear(); // Clear search query after selection
                                               } else {
                                                 // Inform user if the maximum limit is reached
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                    SnackBar(
-                                                      content: Text(
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
                                                         'Maximum limit of 12 entries reached'),
-                                                    ),
-                                                    );
+                                                  ),
+                                                );
                                               }
                                             });
                                           },
@@ -300,6 +343,53 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                             ),
                           ],
                         ),
+                        DataTable(
+                          border: TableBorder.all(
+                            color: Colors.black,
+                            width: 1,
+                            style: BorderStyle.solid,
+                          ),
+                          columns: [
+                            DataColumn(label: Text('Nama')),
+                            DataColumn(label: Text('Warna')),
+                            DataColumn(label: Text('Harga')),
+                            DataColumn(label: Text('Jumlah')),
+                            DataColumn(label: Text('Total')),
+                            DataColumn(label: Text('Hapus')),
+                          ],
+                          rows: selectedItems
+                              .map(
+                                (item) => DataRow(cells: [
+                                  DataCell(Text(item.name)),
+                                  DataCell(Text(item.warna)),
+                                  DataCell(Text(item.harga.toString())),
+                                  DataCell(
+                                    TextFormField(
+                                      initialValue: item.jumlah.toString(),
+                                      keyboardType: TextInputType.number,
+                                      onChanged: (newValue) {
+                                        setState(() {
+                                          item.jumlah =
+                                              int.tryParse(newValue) ?? 0;
+                                          item.total = item.jumlah * item.harga;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  DataCell(Text(item.total.toString())),
+                                  DataCell(IconButton(
+                                    icon: Icon(Icons.delete),
+                                    onPressed: () {
+                                      setState(() {
+                                        selectedItems.remove(item);
+                                        searchResults.add(item);
+                                      });
+                                    },
+                                  )),
+                                ]),
+                              )
+                              .toList(),
+                        )
                       ],
                     ),
                   ],

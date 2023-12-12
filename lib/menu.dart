@@ -16,7 +16,6 @@ class _MenuScreenState extends State<MenuScreen> {
 
   @override
   void initState() {
-    print(FirebaseAuth.instance.userId);
     super.initState();
   }
 
