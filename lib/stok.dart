@@ -11,12 +11,10 @@ class FragmentStokState extends State<FragmentStok> {
   final textSearch = TextEditingController();
   List<Document> data = [];
   final currencyFormat = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp');
-  late MyDataTableSource _tableDataSource;
 
   @override
   void initState() {
     super.initState();
-    _tableDataSource = MyDataTableSource(data, deleteDocument, editDocument);
     getData();
   }
 
@@ -33,7 +31,6 @@ class FragmentStokState extends State<FragmentStok> {
           .orderBy('NamaProduk')
           .get();
     }
-    _tableDataSource = MyDataTableSource(data, deleteDocument, editDocument);
     setState(() {});
   }
 
