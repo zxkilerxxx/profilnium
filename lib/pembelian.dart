@@ -90,7 +90,7 @@ class _FragmentPembelian extends State<FragmentPembelian> {
               tambahData(
                   namaproduk: nameController.text,
                   hargajual: hargaController.text,
-                  jumlah: jumlahController.text,
+                  jumlah: int.parse(jumlahController.text),
                   warna: warnaController.text);
               clearText();
             },

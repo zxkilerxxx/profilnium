@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'package:firedart/auth/user_gateway.dart';
 import 'package:profilnium/services/firebase_auth_service.dart';
-
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:firedart/firedart.dart';
@@ -196,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(
               height: 88.0,
             ),
-            Container(
+            SizedBox(
               width: double.infinity,
               child: RawMaterialButton(
                 fillColor: const Color(0xFF0069FE),

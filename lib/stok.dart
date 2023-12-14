@@ -45,7 +45,7 @@ class FragmentStokState extends State<FragmentStok> {
     String editedNamaProduk = doc['NamaProduk'];
     String editedWarna = doc['warna'];
     String editedHargaJual = doc['HargaJual'];
-    String editedJumlah = doc['Jumlah'];
+    String editedJumlah = doc['Jumlah'].toString();
 
     return showDialog<void>(
       context: context,
@@ -94,7 +94,7 @@ class FragmentStokState extends State<FragmentStok> {
                   'NamaProduk': editedNamaProduk,
                   'warna': editedWarna,
                   'HargaJual': editedHargaJual,
-                  'Jumlah': editedJumlah,
+                  'Jumlah': int.parse(editedJumlah),
                 });
                 Navigator.of(context).pop();
                 WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -119,7 +119,7 @@ class FragmentStokState extends State<FragmentStok> {
             DataCell(Text(result['warna'])),
             DataCell(
                 Text(currencyFormat.format(double.parse(result['HargaJual'])))),
-            DataCell(Text(result['Jumlah'])),
+            DataCell(Text(result['Jumlah'].toString())),
             DataCell(ElevatedButton(
               onPressed: () {
                 editDocument(result);
@@ -144,102 +144,104 @@ class FragmentStokState extends State<FragmentStok> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(25.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "List Produk",
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 44.0,
-                fontWeight: FontWeight.bold,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "List Produk",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 44.0,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: textSearch,
-                  keyboardType: TextInputType.text,
-                  decoration: const InputDecoration(
-                    hintText: "Cari stok berdasarkan nama",
-                    prefixIcon: Icon(Icons.search, color: Colors.black),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: textSearch,
+                    keyboardType: TextInputType.text,
+                    decoration: const InputDecoration(
+                      hintText: "Cari stok berdasarkan nama",
+                      prefixIcon: Icon(Icons.search, color: Colors.black),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20.20),
-                ElevatedButton(
-                  onPressed: () {
-                    getData();
-                  },
-                  child: Text("cari",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 12.0,
-                      )),
-                ),
-                const SizedBox(height: 20.20),
-                SizedBox(
-                  width: double.infinity,
-                  child: PaginatedDataTable(
-                    header: Text('List Produk'),
-                    rowsPerPage: 7,
-                    source:
-                        MyDataTableSource(data, deleteDocument, editDocument),
-                    columns: <DataColumn>[
-                      DataColumn(
-                        label: Expanded(
-                          child: Text(
-                            'Nama Produk',
-                            style: TextStyle(fontStyle: FontStyle.italic),
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Expanded(
-                          child: Text(
-                            'Warna',
-                            style: TextStyle(fontStyle: FontStyle.italic),
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Expanded(
-                          child: Text(
-                            'Harga Jual',
-                            style: TextStyle(fontStyle: FontStyle.italic),
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Expanded(
-                          child: Text(
-                            'Sisa Stok',
-                            style: TextStyle(fontStyle: FontStyle.italic),
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Expanded(
-                          child: Text(
-                            'Edit',
-                            style: TextStyle(fontStyle: FontStyle.italic),
-                          ),
-                        ),
-                      ),
-                      DataColumn(
-                        label: Expanded(
-                          child: Text(
-                            'Hapus',
-                            style: TextStyle(fontStyle: FontStyle.italic),
-                          ),
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 20.20),
+                  ElevatedButton(
+                    onPressed: () {
+                      getData();
+                    },
+                    child: Text("cari",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 12.0,
+                        )),
                   ),
-                )
-              ],
-            ),
-          ],
+                  const SizedBox(height: 20.20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: PaginatedDataTable(
+                      header: Text('List Produk'),
+                      rowsPerPage: 7,
+                      source:
+                          MyDataTableSource(data, deleteDocument, editDocument),
+                      columns: <DataColumn>[
+                        DataColumn(
+                          label: Expanded(
+                            child: Text(
+                              'Nama Produk',
+                              style: TextStyle(fontStyle: FontStyle.italic),
+                            ),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Expanded(
+                            child: Text(
+                              'Warna',
+                              style: TextStyle(fontStyle: FontStyle.italic),
+                            ),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Expanded(
+                            child: Text(
+                              'Harga Jual',
+                              style: TextStyle(fontStyle: FontStyle.italic),
+                            ),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Expanded(
+                            child: Text(
+                              'Sisa Stok',
+                              style: TextStyle(fontStyle: FontStyle.italic),
+                            ),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Expanded(
+                            child: Text(
+                              'Edit',
+                              style: TextStyle(fontStyle: FontStyle.italic),
+                            ),
+                          ),
+                        ),
+                        DataColumn(
+                          label: Expanded(
+                            child: Text(
+                              'Hapus',
+                              style: TextStyle(fontStyle: FontStyle.italic),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -270,7 +272,7 @@ class MyDataTableSource extends DataTableSource {
         DataCell(Text(FragmentStokState()
             .currencyFormat
             .format(double.parse(result['HargaJual'])))),
-        DataCell(Text(result['Jumlah'])),
+        DataCell(Text(result['Jumlah'].toString())),
         DataCell(
           ElevatedButton(
             onPressed: () {

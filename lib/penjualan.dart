@@ -1,10 +1,10 @@
 import 'package:firedart/firedart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:open_file/open_file.dart';
 import 'package:intl/intl.dart';
 
@@ -14,23 +14,30 @@ class FragmentPenjualan extends StatefulWidget {
 }
 
 class Item {
+  final String id;
   final String name;
   final String warna;
+  int sisaStokDb;
   int jumlah;
   int harga;
   int total;
+  TextEditingController jumlahController;
 
   Item({
+    required this.id,
     required this.name,
     required this.warna,
+    required this.sisaStokDb,
     required this.jumlah,
     required this.harga,
     required this.total,
-  });
+  }) : jumlahController = TextEditingController(text: jumlah.toString());
 }
 
 class _FragmentPenjualan extends State<FragmentPenjualan> {
+  TextEditingController jumlahTerjual = TextEditingController();
   int total = 0;
+  int grandTotal = 0;
   TextEditingController _controller = TextEditingController();
   List<Item> items = [];
   List<Item> selectedItems = [];
@@ -54,12 +61,16 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
   Future<void> fetchData() async {
     List<Document> database = await getData();
     for (Document doc in database) {
+      total = int.parse(doc['HargaJual']);
+      print(doc['Jumlah'].toString() + doc['NamaProduk']);
       items.add(Item(
-          name: doc['NamaProduk'],
-          warna: doc['warna'],
-          jumlah: 1,
-          harga: int.parse(doc['HargaJual']),
-          total: total));
+        id: doc.id,
+        name: doc['NamaProduk'],
+        warna: doc['warna'],
+        sisaStokDb: doc['Jumlah'],
+        jumlah: 1,
+        harga: int.parse(doc['HargaJual']),
+        total: total));
     }
     setState(() {
       searchResults = List.from(items);
@@ -148,7 +159,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                 ),
               ),
               pw.SizedBox(height: 20),
-              pw.Table.fromTextArray(
+              pw.TableHelper.fromTextArray(
                 border: pw.TableBorder.all(),
                 headers: <String>['Nama', 'Warna', 'Harga', 'Jumlah', 'Total'],
                 data: selectedItems.map((item) {
@@ -161,6 +172,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                   ];
                 }).toList(),
               ),
+              pw.Align(alignment: pw.Alignment.topRight, child: pw.Text('Grand Total: $grandTotal')),
               pw.SizedBox(height: 20),
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -218,20 +230,50 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
     await OpenFile.open(file.path);
   }
 
-  void _generateInvoiceAndPDF() {
+  Future<void> _generateInvoiceAndPDF() async {
     String noNota = nomor.text;
     String namaPembeli = nama.text;
     String alamatPembeli = alamat.text;
     String pembayaran = _selectedItem ?? '';
 
-    generatePDFInvoice(noNota, namaPembeli, alamatPembeli, pembayaran);
+    await generatePDFInvoice(noNota, namaPembeli, alamatPembeli, pembayaran);
+  }
+
+  void saveInvoice() async {
+    grandTotal = 0;
+    for(Item sold in selectedItems) {
+      grandTotal = grandTotal + sold.total;
+      int sisaStok = sold.sisaStokDb-sold.jumlah;
+      await Firestore.instance.collection('data').document(sold.id).update({'Jumlah': sisaStok});
+    }
+    await _generateInvoiceAndPDF();
+    refresh();
+  }
+
+  void refresh() async {
+    items = [];
+    searchResults = [];
+    selectedItems = [];
+    await fetchData();
+    searchResults = List.from(items);
+    _selectedItem = _items[0];
+    
+    print('peler');
+    setState(() {
+      nomor.clear();
+      _dateController.clear();
+      nama.clear();
+      alamat.clear;
+      _controller.clear();
+      jumlahTerjual.clear();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(0),
+        padding: const EdgeInsets.all(10.0),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Row(
@@ -257,7 +299,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 10.99),
+                        const SizedBox(height: 20),
                         Row(
                           children: [
                             Column(
@@ -283,7 +325,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                             ),
                                             SizedBox(
                                                 height:
-                                                    10), // Adjust the height as needed
+                                                    5), // Adjust the height as needed
                                             SizedBox(
                                               width: 180.0,
                                               height: 30.0,
@@ -303,7 +345,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                           ],
                                         ),
                                         SizedBox(
-                                          width: 50,
+                                          width: 25,
                                         ),
                                         Column(
                                           children: [
@@ -317,7 +359,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                             ),
                                             SizedBox(
                                                 height:
-                                                    10), // Adjust the height as needed
+                                                    5), // Adjust the height as needed
                                             SizedBox(
                                               width: 180.0,
                                               height: 30.0,
@@ -339,7 +381,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                           ],
                                         ),
                                         SizedBox(
-                                          width: 50,
+                                          width: 25,
                                         ),
                                       ],
                                     ),
@@ -362,10 +404,10 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                         ),
                                         SizedBox(
                                             height:
-                                                10), // Adjust the height as needed
+                                                5), // Adjust the height as needed
                                         SizedBox(
                                           width: 180.0,
-                                          height: 30.0,
+                                          height: 50.0,
                                           child: TextField(
                                             controller: nama,
                                             decoration: const InputDecoration(
@@ -380,7 +422,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                         ),
                                         SizedBox(
                                           width: 180.0,
-                                          height: 40.0,
+                                          height: 50.0,
                                           child: TextField(
                                             controller: alamat,
                                             decoration: const InputDecoration(
@@ -396,7 +438,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                       ],
                                     ),
                                     SizedBox(
-                                      width: 50,
+                                      width: 25,
                                     ),
                                     Column(
                                       children: [
@@ -410,17 +452,15 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                         ),
                                         SizedBox(
                                             height:
-                                                10), // Adjust the height as needed
+                                                5), // Adjust the height as needed
                                         SizedBox(
                                           width: 180.0,
                                           height: 55.0,
-                                          child:
-                                              DropdownButtonFormField<String>(
+                                          child: DropdownButtonFormField<String>(
                                             value: _selectedItem,
                                             items: _items.map((String value) {
                                               return DropdownMenuItem<String>(
-                                                value:
-                                                    value, // Ensure each value is unique
+                                                value: value, // Ensure each value is unique
                                                 child: Text(value),
                                               );
                                             }).toList(),
@@ -430,11 +470,9 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                               });
                                             },
                                             decoration: InputDecoration(
-                                                border: OutlineInputBorder(),
-                                                hintText: 'Select',
-                                                labelText: 'JENIS PEMBAYARAN',
-                                                hintStyle:
-                                                    TextStyle(fontSize: 12)),
+                                              border: OutlineInputBorder(),
+                                              hintStyle: TextStyle(fontSize: 12)
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -443,85 +481,102 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                 ),
                               ],
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  SizedBox(
-                                    width: 350.0,
-                                    height: 35.0,
-                                    child: TextField(
-                                      controller: _controller,
-                                      decoration: InputDecoration(
-                                        labelText: 'Search',
-                                        hintText: 'Search items...',
-                                        prefixIcon: Icon(Icons.search),
-                                        border: OutlineInputBorder(),
-                                      ),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          searchResults = items
-                                              .where((item) => item.name
-                                                  .toLowerCase()
-                                                  .contains(
-                                                      value.toLowerCase()))
-                                              .toList();
-                                        });
-                                      },
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(
+                                  width: 350.0,
+                                  height: 35.0,
+                                  child: TextField(
+                                    controller: _controller,
+                                    decoration: InputDecoration(
+                                      labelText: 'Cari',
+                                      hintText: 'Cari barang...',
+                                      prefixIcon: Icon(Icons.search),
+                                      border: OutlineInputBorder(),
                                     ),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        searchResults = items
+                                            .where((item) => item.name
+                                                .toLowerCase()
+                                                .contains(
+                                                    value.toLowerCase()))
+                                            .toList();
+                                      });
+                                    },
                                   ),
-                                  SizedBox(
-                                    height: 100.0,
-                                    width: 350.0,
-                                    child: ListView.builder(
-                                      itemCount: searchResults.length,
-                                      itemBuilder: (context, index) {
-                                        return ListTile(
-                                          title: Text(
-                                            '${searchResults[index].name} ${searchResults[index].warna}',
-                                          ),
-                                          onTap: () {
-                                            setState(() {
-                                              if (selectedItems.length < 12 &&
-                                                  !selectedItems.contains(
-                                                      searchResults[index])) {
-                                                selectedItems
-                                                    .add(searchResults[index]);
-                                                searchResults.remove(
-                                                    searchResults[index]);
-                                                _controller
-                                                    .clear(); // Clear search query after selection
-                                              } else {
-                                                // Inform user if the maximum limit is reached
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                        'Maximum limit of 12 entries reached'),
-                                                  ),
-                                                );
-                                              }
-                                            });
-                                          },
-                                        );
-                                      },
-                                    ),
+                                ),
+                                SizedBox(
+                                  height: 144.0,
+                                  width: 350.0,
+                                  child: ListView.builder(
+                                    itemCount: searchResults.length,
+                                    itemBuilder: (context, index) {
+                                      return ListTile(
+                                        title: Text(
+                                          '${searchResults[index].name} ${searchResults[index].warna}',
+                                        ),
+                                        onTap: () {
+                                          setState(() {
+                                            if (selectedItems.length < 12 &&
+                                                !selectedItems.contains(
+                                                    searchResults[index])) {
+                                              selectedItems
+                                                  .add(searchResults[index]);
+                                              searchResults.remove(
+                                                  searchResults[index]);
+                                              _controller
+                                                  .clear(); // Clear search query after selection
+                                            } else {
+                                              // Inform user if the maximum limit is reached
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                      'Maximum limit of 12 entries reached'),
+                                                ),
+                                              );
+                                            }
+                                          });
+                                        },
+                                      );
+                                    },
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                            ElevatedButton(
-                              onPressed: () {
-                                _generateInvoiceAndPDF();
-                              },
-                              child: Text('Generate PDF Invoice'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {},
-                              child: Text('Save'),
+                            SizedBox(width: 25),
+                            Column(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    saveInvoice();
+                                  },
+                                  child: Text('Simpan'),
+                                ),
+                                SizedBox(height: 20),
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    await _generateInvoiceAndPDF();
+                                  },
+                                  child: Text('Cetak'),
+                                ),
+                                SizedBox(height: 20),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    refresh();
+                                  },
+                                  child: Text('Baru'),
+                                ),
+                              ],
                             ),
                           ],
+                        ),
+                        SizedBox(
+                          height: 20,
                         ),
                         DataTable(
                           border: TableBorder.all(
@@ -533,24 +588,26 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                             DataColumn(label: Text('Nama')),
                             DataColumn(label: Text('Warna')),
                             DataColumn(label: Text('Harga')),
+                            DataColumn(label: Text('Sisa Stok')),
                             DataColumn(label: Text('Jumlah')),
                             DataColumn(label: Text('Total')),
                             DataColumn(label: Text('Hapus')),
                           ],
-                          rows: selectedItems
-                              .map(
+                          rows: selectedItems.map(
                                 (item) => DataRow(cells: [
                                   DataCell(Text(item.name)),
                                   DataCell(Text(item.warna)),
                                   DataCell(Text(item.harga.toString())),
+                                  DataCell(Text(item.sisaStokDb.toString())),
                                   DataCell(
                                     TextFormField(
-                                      initialValue: item.jumlah.toString(),
                                       keyboardType: TextInputType.number,
+                                      inputFormatters: <TextInputFormatter>[
+                                        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                                      ],
                                       onChanged: (newValue) {
                                         setState(() {
-                                          item.jumlah =
-                                              int.tryParse(newValue) ?? 0;
+                                          item.jumlah = int.tryParse(newValue) ?? 1;
                                           item.total = item.jumlah * item.harga;
                                         });
                                       },
@@ -561,8 +618,8 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                     icon: Icon(Icons.delete),
                                     onPressed: () {
                                       setState(() {
-                                        selectedItems.remove(item);
                                         searchResults.add(item);
+                                        selectedItems.remove(item);
                                       });
                                     },
                                   )),

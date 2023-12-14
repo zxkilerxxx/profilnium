@@ -1,4 +1,3 @@
-import 'package:firedart/auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:profilnium/home.dart';
 import 'package:profilnium/invoice.dart';
@@ -64,6 +63,8 @@ class _MenuScreenState extends State<MenuScreen> {
             children: [
               SafeArea(
                 child: NavigationRail(
+                  minWidth: 60,
+                  backgroundColor: colorScheme.surfaceVariant,
                   extended: true,
                   destinations: [
                     NavigationRailDestination(
