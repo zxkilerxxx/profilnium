@@ -67,6 +67,9 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
   }
 
   TextEditingController _dateController = TextEditingController();
+  final nomor = TextEditingController();
+  final nama = TextEditingController();
+  final alamat = TextEditingController();
   DateTime? _selectedDate;
 
   Future<void> _selectDate(BuildContext context) async {
@@ -84,7 +87,8 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
     }
   }
 
-  Future<void> generatePDFInvoice() async {
+  Future<void> generatePDFInvoice(String noNota, String namaPembeli,
+      String alamatPembeli, String pembayaran) async {
     final pdf = pw.Document();
 
     pdf.addPage(
@@ -104,31 +108,43 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                         pw.Text('ProfilNium',
                             style: pw.TextStyle(fontSize: 20)),
                         pw.Text(
-                          _getFormattedDate(),
+                          _dateController.text,
                           style: pw.TextStyle(fontSize: 12),
                         ),
                       ],
                     ),
-                    pw.Text(
-                      'Supplier Aluminium',
-                      style: pw.TextStyle(fontSize: 12),
-                    ),
-                    pw.Text(
-                      'Aluminium Extrusion, Aluminium & \n Glass Accessories, Glass Work',
-                      style: pw.TextStyle(fontSize: 8),
-                    ),
-                    pw.Text(
-                      'HP/WA : 0812 5737 395 \nJL. Trans Kalimantan-Ambawang',
-                      style: pw.TextStyle(fontSize: 12),
-                    ),
+                    pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                        children: [
+                          pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
+                                pw.Text(
+                                  'Supplier Aluminium',
+                                  style: pw.TextStyle(fontSize: 12),
+                                ),
+                                pw.Text(
+                                  'Aluminium Extrusion, Aluminium & \n Glass Accessories, Glass Work',
+                                  style: pw.TextStyle(fontSize: 8),
+                                ),
+                                pw.Text(
+                                  'HP/WA : 0812 5737 395 \nJL. Trans Kalimantan-Ambawang',
+                                  style: pw.TextStyle(fontSize: 12),
+                                ),
+                              ]),
+                          pw.Center(
+                            child: pw.Text(
+                              'Invoice',
+                              style: pw.TextStyle(
+                                  fontSize: 20, fontWeight: pw.FontWeight.bold),
+                            ),
+                          ),
+                          pw.Text(
+                            'No Nota: $noNota \nDitujukan kepada: $namaPembeli \nAlamat Pembeli: $alamatPembeli \nJenis Pembayaran: $pembayaran',
+                            style: pw.TextStyle(fontSize: 8),
+                          ),
+                        ])
                   ],
-                ),
-              ),
-              pw.Center(
-                child: pw.Text(
-                  'Invoice',
-                  style: pw.TextStyle(
-                      fontSize: 20, fontWeight: pw.FontWeight.bold),
                 ),
               ),
               pw.SizedBox(height: 20),
@@ -202,9 +218,13 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
     await OpenFile.open(file.path);
   }
 
-  String _getFormattedDate() {
-    final now = DateTime.now();
-    return '${now.day}/${now.month}/${now.year}';
+  void _generateInvoiceAndPDF() {
+    String noNota = nomor.text;
+    String namaPembeli = nama.text;
+    String alamatPembeli = alamat.text;
+    String pembayaran = _selectedItem ?? '';
+
+    generatePDFInvoice(noNota, namaPembeli, alamatPembeli, pembayaran);
   }
 
   @override
@@ -268,6 +288,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                               width: 180.0,
                                               height: 30.0,
                                               child: TextField(
+                                                controller: nomor,
                                                 decoration:
                                                     const InputDecoration(
                                                   hintText: "Masukkan No Nota",
@@ -346,7 +367,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                           width: 180.0,
                                           height: 30.0,
                                           child: TextField(
-                                            // controller: pass1,
+                                            controller: nama,
                                             decoration: const InputDecoration(
                                               hintText: "Nama Pembeli",
                                               hintStyle:
@@ -361,7 +382,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                           width: 180.0,
                                           height: 40.0,
                                           child: TextField(
-                                            // controller: pass1,
+                                            controller: alamat,
                                             decoration: const InputDecoration(
                                               hintText: "Alamat Pembeli",
                                               hintStyle:
@@ -423,7 +444,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                               ],
                             ),
                             Padding(
-                              padding: const EdgeInsets.all(50.0),
+                              padding: const EdgeInsets.all(20.0),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -492,9 +513,13 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                             ),
                             ElevatedButton(
                               onPressed: () {
-                                generatePDFInvoice();
+                                _generateInvoiceAndPDF();
                               },
                               child: Text('Generate PDF Invoice'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {},
+                              child: Text('Save'),
                             ),
                           ],
                         ),
