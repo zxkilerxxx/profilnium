@@ -1,6 +1,7 @@
 import 'package:firedart/auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:profilnium/home.dart';
+import 'package:profilnium/invoice.dart';
 import 'package:profilnium/stok.dart';
 import 'package:profilnium/pembelian.dart';
 import 'package:profilnium/penjualan.dart';
@@ -38,6 +39,9 @@ class _MenuScreenState extends State<MenuScreen> {
         page = FragmentPenjualan();
         break;
       case 4:
+        page = FragmentInvoice();
+        break;
+      case 5:
         page = FragmentPengaturan();
         break;
       default:
@@ -77,6 +81,10 @@ class _MenuScreenState extends State<MenuScreen> {
                     NavigationRailDestination(
                       icon: Icon(Icons.attach_money),
                       label: Text("Penjualan"),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.mail),
+                      label: Text("Invoice"),
                     ),
                     NavigationRailDestination(
                       icon: Icon(Icons.settings),
