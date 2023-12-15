@@ -352,360 +352,375 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
             mainAxisSize: MainAxisSize.max,
             children: [
               Expanded(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Penjualan',
-                            style: TextStyle(
-                              color: Color(0xFF343A40),
-                              fontSize: 24,
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.w300,
-                              height: 0.03,
-                              letterSpacing: 3.10,
+                child: SingleChildScrollView(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
+                        children: [
+                          Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              'Penjualan',
+                              style: TextStyle(
+                                color: Color(0xFF343A40),
+                                fontSize: 24,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w300,
+                                height: 0.03,
+                                letterSpacing: 3.10,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Column(
-                                          children: [
-                                            Text(
-                                              'No Nota',
-                                              style: TextStyle(
-                                                color: Color(0xFF343A40),
-                                                fontSize: 15,
-                                                fontFamily: 'Poppins',
-                                              ),
-                                            ),
-                                            SizedBox(
-                                                height:
-                                                    5), // Adjust the height as needed
-                                            SizedBox(
-                                              width: 180.0,
-                                              height: 30.0,
-                                              child: TextField(
-                                                controller: nomor,
-                                                decoration:
-                                                    const InputDecoration(
-                                                  hintText: "Masukkan No Nota",
-                                                  hintStyle:
-                                                      TextStyle(fontSize: 12),
-                                                  border:
-                                                      OutlineInputBorder(), // Adding border for better visibility
+                          const SizedBox(height: 20),
+                          Row(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Column(
+                                            children: [
+                                              Text(
+                                                'No Nota',
+                                                style: TextStyle(
+                                                  color: Color(0xFF343A40),
+                                                  fontSize: 15,
+                                                  fontFamily: 'Poppins',
                                                 ),
-                                                style: TextStyle(fontSize: 12),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          width: 25,
-                                        ),
-                                        Column(
-                                          children: [
-                                            Text(
-                                              'Tanggal',
-                                              style: TextStyle(
-                                                color: Color(0xFF343A40),
-                                                fontSize: 15,
-                                                fontFamily: 'Poppins',
-                                              ),
-                                            ),
-                                            SizedBox(
-                                                height:
-                                                    5), // Adjust the height as needed
-                                            SizedBox(
-                                              width: 180.0,
-                                              height: 30.0,
-                                              child: TextFormField(
-                                                controller: _dateController,
-                                                onTap: () =>
-                                                    _selectDate(context),
-                                                readOnly: true,
-                                                decoration:
-                                                    const InputDecoration(
-                                                  hintText: "Select Date",
-                                                  hintStyle:
+                                              SizedBox(
+                                                  height:
+                                                      5), // Adjust the height as needed
+                                              SizedBox(
+                                                width: 180.0,
+                                                height: 30.0,
+                                                child: TextField(
+                                                  controller: nomor,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    hintText:
+                                                        "Masukkan No Nota",
+                                                    hintStyle:
+                                                        TextStyle(fontSize: 12),
+                                                    border:
+                                                        OutlineInputBorder(), // Adding border for better visibility
+                                                  ),
+                                                  style:
                                                       TextStyle(fontSize: 12),
-                                                  border: OutlineInputBorder(),
                                                 ),
-                                                style: TextStyle(fontSize: 12),
                                               ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            width: 25,
+                                          ),
+                                          Column(
+                                            children: [
+                                              Text(
+                                                'Tanggal',
+                                                style: TextStyle(
+                                                  color: Color(0xFF343A40),
+                                                  fontSize: 15,
+                                                  fontFamily: 'Poppins',
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                  height:
+                                                      5), // Adjust the height as needed
+                                              SizedBox(
+                                                width: 180.0,
+                                                height: 30.0,
+                                                child: TextFormField(
+                                                  controller: _dateController,
+                                                  onTap: () =>
+                                                      _selectDate(context),
+                                                  readOnly: true,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    hintText: "Select Date",
+                                                    hintStyle:
+                                                        TextStyle(fontSize: 12),
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                  ),
+                                                  style:
+                                                      TextStyle(fontSize: 12),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            width: 25,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 20),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Column(
+                                        children: [
+                                          Text(
+                                            'Ditujukan kepada',
+                                            style: TextStyle(
+                                              color: Color(0xFF343A40),
+                                              fontSize: 15,
+                                              fontFamily: 'Poppins',
                                             ),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          width: 25,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 20),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Column(
-                                      children: [
-                                        Text(
-                                          'Ditujukan kepada',
-                                          style: TextStyle(
-                                            color: Color(0xFF343A40),
-                                            fontSize: 15,
-                                            fontFamily: 'Poppins',
                                           ),
-                                        ),
-                                        SizedBox(
-                                            height:
-                                                5), // Adjust the height as needed
-                                        SizedBox(
-                                          width: 180.0,
-                                          height: 50.0,
-                                          child: TextField(
-                                            controller: nama,
-                                            decoration: const InputDecoration(
-                                              hintText: "Nama Pembeli",
-                                              hintStyle:
-                                                  TextStyle(fontSize: 12),
-                                              border:
-                                                  OutlineInputBorder(), // Adding border for better visibility
-                                            ),
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 180.0,
-                                          height: 50.0,
-                                          child: TextField(
-                                            controller: alamat,
-                                            decoration: const InputDecoration(
-                                              hintText: "Alamat Pembeli",
-                                              hintStyle:
-                                                  TextStyle(fontSize: 12),
-                                              border:
-                                                  OutlineInputBorder(), // Adding border for better visibility
-                                            ),
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      width: 25,
-                                    ),
-                                    Column(
-                                      children: [
-                                        Text(
-                                          'Pembayaran',
-                                          style: TextStyle(
-                                            color: Color(0xFF343A40),
-                                            fontSize: 15,
-                                            fontFamily: 'Poppins',
-                                          ),
-                                        ),
-                                        SizedBox(
-                                            height:
-                                                5), // Adjust the height as needed
-                                        SizedBox(
-                                          width: 180.0,
-                                          height: 55.0,
-                                          child:
-                                              DropdownButtonFormField<String>(
-                                            value: _selectedItem,
-                                            items: _items.map((String value) {
-                                              return DropdownMenuItem<String>(
-                                                value:
-                                                    value, // Ensure each value is unique
-                                                child: Text(value),
-                                              );
-                                            }).toList(),
-                                            onChanged: (String? newValue) {
-                                              setState(() {
-                                                _selectedItem = newValue;
-                                              });
-                                            },
-                                            decoration: InputDecoration(
-                                                border: OutlineInputBorder(),
+                                          SizedBox(
+                                              height:
+                                                  5), // Adjust the height as needed
+                                          SizedBox(
+                                            width: 180.0,
+                                            height: 50.0,
+                                            child: TextField(
+                                              controller: nama,
+                                              decoration: const InputDecoration(
+                                                hintText: "Nama Pembeli",
                                                 hintStyle:
-                                                    TextStyle(fontSize: 12)),
+                                                    TextStyle(fontSize: 12),
+                                                border:
+                                                    OutlineInputBorder(), // Adding border for better visibility
+                                              ),
+                                              style: TextStyle(fontSize: 12),
+                                            ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SizedBox(
-                                  width: 350.0,
-                                  height: 35.0,
-                                  child: TextField(
-                                    controller: _controller,
-                                    decoration: InputDecoration(
-                                      labelText: 'Cari',
-                                      hintText: 'Cari barang...',
-                                      prefixIcon: Icon(Icons.search),
-                                      border: OutlineInputBorder(),
-                                    ),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        searchResults = items
-                                            .where((item) => item.name
-                                                .toLowerCase()
-                                                .contains(value.toLowerCase()))
-                                            .toList();
-                                      });
-                                    },
+                                          SizedBox(
+                                            width: 180.0,
+                                            height: 50.0,
+                                            child: TextField(
+                                              controller: alamat,
+                                              decoration: const InputDecoration(
+                                                hintText: "Alamat Pembeli",
+                                                hintStyle:
+                                                    TextStyle(fontSize: 12),
+                                                border:
+                                                    OutlineInputBorder(), // Adding border for better visibility
+                                              ),
+                                              style: TextStyle(fontSize: 12),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        width: 25,
+                                      ),
+                                      Column(
+                                        children: [
+                                          Text(
+                                            'Pembayaran',
+                                            style: TextStyle(
+                                              color: Color(0xFF343A40),
+                                              fontSize: 15,
+                                              fontFamily: 'Poppins',
+                                            ),
+                                          ),
+                                          SizedBox(
+                                              height:
+                                                  5), // Adjust the height as needed
+                                          SizedBox(
+                                            width: 180.0,
+                                            height: 55.0,
+                                            child:
+                                                DropdownButtonFormField<String>(
+                                              value: _selectedItem,
+                                              items: _items.map((String value) {
+                                                return DropdownMenuItem<String>(
+                                                  value:
+                                                      value, // Ensure each value is unique
+                                                  child: Text(value),
+                                                );
+                                              }).toList(),
+                                              onChanged: (String? newValue) {
+                                                setState(() {
+                                                  _selectedItem = newValue;
+                                                });
+                                              },
+                                              decoration: InputDecoration(
+                                                  border: OutlineInputBorder(),
+                                                  hintStyle:
+                                                      TextStyle(fontSize: 12)),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                SizedBox(
-                                  height: 144.0,
-                                  width: 350.0,
-                                  child: ListView.builder(
-                                    itemCount: searchResults.length,
-                                    itemBuilder: (context, index) {
-                                      return ListTile(
-                                        title: Text(
-                                          '${searchResults[index].name} ${searchResults[index].warna}',
-                                        ),
-                                        onTap: () {
-                                          setState(() {
-                                            if (selectedItems.length < 12 &&
-                                                !selectedItems.contains(
-                                                    searchResults[index])) {
-                                              selectedItems
-                                                  .add(searchResults[index]);
-                                              searchResults
-                                                  .remove(searchResults[index]);
-                                              _controller
-                                                  .clear(); // Clear search query after selection
-                                            } else {
-                                              // Inform user if the maximum limit is reached
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                      'Maximum limit of 12 entries reached'),
-                                                ),
-                                              );
-                                            }
-                                          });
-                                        },
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(width: 25),
-                            Column(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                ElevatedButton(
-                                  onPressed: () {
-                                    saveInvoice();
-                                  },
-                                  child: Text('Simpan'),
-                                ),
-                                SizedBox(height: 20),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    printBluetooth();
-                                  },
-                                  child: Text('Cetak'),
-                                ),
-                                SizedBox(height: 20),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    refresh();
-                                  },
-                                  child: Text('Baru'),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        DataTable(
-                          border: TableBorder.all(
-                            color: Colors.black,
-                            width: 1,
-                            style: BorderStyle.solid,
-                          ),
-                          columns: [
-                            DataColumn(label: Text('Nama')),
-                            DataColumn(label: Text('Warna')),
-                            DataColumn(label: Text('Harga')),
-                            DataColumn(label: Text('Sisa Stok')),
-                            DataColumn(label: Text('Jumlah')),
-                            DataColumn(label: Text('Total')),
-                            DataColumn(label: Text('Hapus')),
-                          ],
-                          rows: selectedItems
-                              .map(
-                                (item) => DataRow(cells: [
-                                  DataCell(Text(item.name)),
-                                  DataCell(Text(item.warna)),
-                                  DataCell(Text(item.harga.toString())),
-                                  DataCell(Text(item.sisaStokDb.toString())),
-                                  DataCell(
-                                    TextFormField(
-                                      keyboardType: TextInputType.number,
-                                      inputFormatters: <TextInputFormatter>[
-                                        FilteringTextInputFormatter.allow(
-                                            RegExp(r'[0-9]')),
-                                      ],
-                                      onChanged: (newValue) {
+                                ],
+                              ),
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: 350.0,
+                                    height: 35.0,
+                                    child: TextField(
+                                      controller: _controller,
+                                      decoration: InputDecoration(
+                                        labelText: 'Cari',
+                                        hintText: 'Cari barang...',
+                                        prefixIcon: Icon(Icons.search),
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      onChanged: (value) {
                                         setState(() {
-                                          item.jumlah =
-                                              int.tryParse(newValue) ?? 1;
-                                          item.total = item.jumlah * item.harga;
+                                          searchResults = items
+                                              .where((item) => item.name
+                                                  .toLowerCase()
+                                                  .contains(
+                                                      value.toLowerCase()))
+                                              .toList();
                                         });
                                       },
                                     ),
                                   ),
-                                  DataCell(Text(item.total.toString())),
-                                  DataCell(IconButton(
-                                    icon: Icon(Icons.delete),
+                                  SizedBox(
+                                    height: 144.0,
+                                    width: 350.0,
+                                    child: ListView.builder(
+                                      itemCount: searchResults.length,
+                                      itemBuilder: (context, index) {
+                                        return ListTile(
+                                          title: Text(
+                                            '${searchResults[index].name} ${searchResults[index].warna}',
+                                          ),
+                                          onTap: () {
+                                            setState(() {
+                                              if (selectedItems.length < 12 &&
+                                                  !selectedItems.contains(
+                                                      searchResults[index])) {
+                                                selectedItems
+                                                    .add(searchResults[index]);
+                                                searchResults.remove(
+                                                    searchResults[index]);
+                                                _controller
+                                                    .clear(); // Clear search query after selection
+                                              } else {
+                                                // Inform user if the maximum limit is reached
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                        'Maximum limit of 12 entries reached'),
+                                                  ),
+                                                );
+                                              }
+                                            });
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(width: 25),
+                              Column(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  ElevatedButton(
                                     onPressed: () {
-                                      setState(() {
-                                        searchResults.add(item);
-                                        selectedItems.remove(item);
-                                      });
+                                      saveInvoice();
                                     },
-                                  )),
-                                ]),
-                              )
-                              .toList(),
-                        )
-                      ],
-                    ),
-                  ],
+                                    child: Text('Simpan'),
+                                  ),
+                                  SizedBox(height: 20),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      kirimInvoice();
+                                      Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  PreviewPrint(
+                                                      invoice: invoice)));
+                                    },
+                                    child: Text('Cetak'),
+                                  ),
+                                  SizedBox(height: 20),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      refresh();
+                                    },
+                                    child: Text('Baru'),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          DataTable(
+                            border: TableBorder.all(
+                              color: Colors.black,
+                              width: 1,
+                              style: BorderStyle.solid,
+                            ),
+                            columns: [
+                              DataColumn(label: Text('Nama')),
+                              DataColumn(label: Text('Warna')),
+                              DataColumn(label: Text('Harga')),
+                              DataColumn(label: Text('Sisa Stok')),
+                              DataColumn(label: Text('Jumlah')),
+                              DataColumn(label: Text('Total')),
+                              DataColumn(label: Text('Hapus')),
+                            ],
+                            rows: selectedItems
+                                .map(
+                                  (item) => DataRow(cells: [
+                                    DataCell(Text(item.name)),
+                                    DataCell(Text(item.warna)),
+                                    DataCell(Text(item.harga.toString())),
+                                    DataCell(Text(item.sisaStokDb.toString())),
+                                    DataCell(
+                                      TextFormField(
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.allow(
+                                              RegExp(r'[0-9]')),
+                                        ],
+                                        onChanged: (newValue) {
+                                          setState(() {
+                                            item.jumlah =
+                                                int.tryParse(newValue) ?? 1;
+                                            item.total =
+                                                item.jumlah * item.harga;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    DataCell(Text(item.total.toString())),
+                                    DataCell(IconButton(
+                                      icon: Icon(Icons.delete),
+                                      onPressed: () {
+                                        setState(() {
+                                          searchResults.add(item);
+                                          selectedItems.remove(item);
+                                        });
+                                      },
+                                    )),
+                                  ]),
+                                )
+                                .toList(),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
