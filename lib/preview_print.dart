@@ -72,7 +72,6 @@ class _PreviewPrint extends State<PreviewPrint> {
 
   Future<Uint8List> _generatePdf(PdfPageFormat format, Invoice invoice) async {
     final pdf = pw.Document(version: PdfVersion.pdf_1_5, compress: true);
-    final font = await PdfGoogleFonts.nunitoExtraLight();
     List<Item> barangJual = widget.invoice.barang;
 
     pdf.addPage(

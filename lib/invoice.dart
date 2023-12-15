@@ -1,6 +1,5 @@
 import 'package:firedart/firedart.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class FragmentInvoice extends StatefulWidget {
   @override
