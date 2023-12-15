@@ -56,12 +56,10 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
     searchResults = List.from(items);
     _selectedItem = _items[0];
   }
-
   Future<List<Document>> getData() async {
     List<Document> document = await Firestore.instance.collection('data').get();
     return document;
   }
-
   Future<void> fetchData() async {
     List<Document> database = await getData();
     for (Document doc in database) {
@@ -85,7 +83,6 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
   final nama = TextEditingController();
   final alamat = TextEditingController();
   DateTime? _selectedDate;
-
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -100,11 +97,9 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
       });
     }
   }
-
   Future<void> generatePDFInvoice(String noNota, String namaPembeli,
       String alamatPembeli, String pembayaran) async {
     final pdf = pw.Document();
-
     pdf.addPage(
       pw.Page(
         build: (pw.Context context) {
@@ -192,12 +187,10 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                     ),
                     child: pw.Center(child: pw.Text('Signature 1')),
                   ),
-
                   pw.Text(
                     'PERHATIAN!!!\nBarang  yang sudah dibeli tidak\ndapat ditukar atau dikembalikan',
                     style: pw.TextStyle(fontSize: 8),
                   ),
-
                   // Placeholder for second signature
                   pw.Container(
                     width: 200,
@@ -222,21 +215,16 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
     final output = await getTemporaryDirectory();
     final file = File('${output.path}/invoice.pdf');
     await file.writeAsBytes(await pdf.save());
-
     print('PDF invoice generated: ${file.path}');
-
     // Open the PDF file using the default PDF viewer
     // await launch(file.path);
-
     await OpenFile.open(file.path);
   }
-
   Future<void> _generateInvoiceAndPDF() async {
     String noNota = nomor.text;
     String namaPembeli = nama.text;
     String alamatPembeli = alamat.text;
     String pembayaran = _selectedItem ?? '';
-
     await generatePDFInvoice(noNota, namaPembeli, alamatPembeli, pembayaran);
   }
 
