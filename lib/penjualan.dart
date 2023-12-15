@@ -92,7 +92,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != _selectedDate) {
+    if (picked != null) {
       setState(() {
         _selectedDate = picked;
         _dateController.text = DateFormat('yyyy-MM-dd').format(_selectedDate!);
