@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:firedart/auth/user_gateway.dart';
+import 'package:profilnium/menu_user.dart';
 import 'package:profilnium/services/firebase_auth_service.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +11,7 @@ import 'package:profilnium/menu.dart';
 import 'package:profilnium/services/utility_service.dart';
 
 void main() {
-  FirebaseAuth.initialize(
-      DefaultFirebaseOptions.currentPlatform.apiKey, VolatileStore());
+  FirebaseAuth.initialize(DefaultFirebaseOptions.currentPlatform.apiKey, VolatileStore());
   Firestore.initialize(DefaultFirebaseOptions.currentPlatform.projectId);
   runApp(MyApp());
 }
@@ -34,36 +35,41 @@ class _MyAppState extends State<MyApp> {
 
   checkConnection() {
     _utilityService.checkConnectivity().then((value) => {
-          if (value != _isOnline)
-            {
-              setState(() {
-                _isOnline = value;
-              })
-            }
-        });
+      if (value != _isOnline)
+        {
+          setState(() {
+            _isOnline = value;
+          })
+        }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Profilnium',
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF0080FF)),
-        ),
-        home: _isOnline
-            ? LoginScreen()
-            : Scaffold(
-                body: Center(
-                    child: Column(children: [
+      debugShowCheckedModeBanner: false,
+      title: 'Profilnium',
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF0080FF)),
+      ),
+      home: _isOnline
+        ? LoginScreen()
+        : Scaffold(
+          body: Center(
+            child: Column(
+              children: [
                 LoadingAnimationWidget.staggeredDotsWave(
                   color: Theme.of(context).colorScheme.primary,
                   size: 50.0,
                 ),
                 SizedBox(height: 50),
                 Text("Tidak ada koneksi internet")
-              ]))));
+              ]
+            )
+          )
+        )
+    );
   }
 }
 
@@ -75,16 +81,17 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  User? user;
   final query = Firestore.instance.collection("user");
   FirebaseAuthService _firebaseAuthService = FirebaseAuthService();
   Future<bool> loginUser(
       {required String userName, required String password}) async {
     try {
       var querySnapshot =
-          await query.where("username", isEqualTo: userName).get();
+        await query.where("username", isEqualTo: userName).get();
       for (var docSnapshot in querySnapshot) {
         if (password == docSnapshot["password"].toString()) {
-          if (userName == "admin") {
+          if (userName == "") {
             _firebaseAuthService.signOut();
             await _firebaseAuthService.signIn("admin@admin.com", "abcabc123");
           } else if (userName == "user") {
@@ -94,11 +101,11 @@ class _LoginScreenState extends State<LoginScreen> {
           }
           return true;
         } else {
-          print('Incorrect password');
+          showAboutDialog(context: context);
           return false;
         }
       }
-      return false; // User not found
+      return false;
     } catch (e) {
       print('Error: $e');
       return false;
@@ -111,8 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
     TextEditingController emailController = TextEditingController();
     TextEditingController passwordController = TextEditingController();
 
-    showAlertDialog(BuildContext context) {
-      // set up the button
+    showAlertDialog(BuildContext context, String title, String message) {
       Widget okButton = TextButton(
         child: Text("OK"),
         onPressed: () {
@@ -122,8 +128,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // set up the AlertDialog
       AlertDialog alert = AlertDialog(
-        title: Text('Warning'),
-        content: Text('Username/password salah !'),
+        title: Text(title),
+        content: Text(message),
         actions: [
           okButton,
         ],
@@ -206,10 +212,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (await loginUser(
                       userName: emailController.text,
                       password: passwordController.text)) {
-                    Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => MenuScreen()));
+                        user = await FirebaseAuth.instance.getUser();
+                        if(user?.email == 'admin@admin.com') {
+                          Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(builder: (context) => MenuScreen()));
+                        } else {
+                          Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(builder: (context) => MenuUserScreen()));
+                        }
+                        
                   } else {
-                    showAlertDialog(context);
+                    showAlertDialog(context, 'Gagal', 'Username/password salah');
                   }
                 },
                 child: const Text("Login",
