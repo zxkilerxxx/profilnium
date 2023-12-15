@@ -2,12 +2,15 @@
 
 import 'dart:typed_data';
 
+import 'package:firedart/auth/user_gateway.dart';
+import 'package:firedart/firedart.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:profilnium/data_model.dart';
 import 'package:profilnium/menu.dart';
+import 'package:profilnium/menu_user.dart';
 import 'package:profilnium/penjualan.dart';
 
 class PreviewPrint extends StatefulWidget {
@@ -27,6 +30,7 @@ class ReceiveData {
 }
 
 class _PreviewPrint extends State<PreviewPrint> {
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -35,10 +39,15 @@ class _PreviewPrint extends State<PreviewPrint> {
           title: Text('Print Preview'),
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              // Navigate back to the previous screen
-              Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => MenuScreen()));
+            onPressed: () async {
+              User user = await FirebaseAuth.instance.getUser();
+                if(user.email == 'admin@admin.com') {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => MenuScreen()));
+                  } else {
+                    Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => MenuUserScreen()));
+                  }
             },
           ),
         ),
