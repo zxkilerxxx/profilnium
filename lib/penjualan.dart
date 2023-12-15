@@ -100,6 +100,11 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
     }
   }
 
+  String _getFormattedDate() {
+    final now = DateTime.now();
+    return '${now.year}/${now.month}/${now.day}';
+  }
+
   Future<void> generatePDFInvoice(String noNota, String namaPembeli,
       String alamatPembeli, String pembayaran) async {
     final pdf = pw.Document();
