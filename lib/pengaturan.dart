@@ -10,8 +10,7 @@ class FragmentPengaturan extends StatefulWidget {
 class _FragmentPengaturan extends State<FragmentPengaturan> {
   final pass1 = TextEditingController();
   final pass2 = TextEditingController();
-  String message = "";
-  String title = "";
+  bool isButtonDisabled = false;
 
   void clearText() {
     pass1.text = "";
@@ -23,12 +22,9 @@ class _FragmentPengaturan extends State<FragmentPengaturan> {
     await Firestore.instance
         .document('user/${user.id}')
         .update({'password': password});
-    message = "Ubah password berhasil";
-    title = "Sukses";
   }
 
-  showAlertDialog(BuildContext context) {
-    // set up the button
+  showAlertDialog(BuildContext context, String title, String newMsg) {
     Widget okButton = TextButton(
       child: Text("OK"),
       onPressed: () {
@@ -36,16 +32,14 @@ class _FragmentPengaturan extends State<FragmentPengaturan> {
       },
     );
 
-    // set up the AlertDialog
     AlertDialog alert = AlertDialog(
       title: Text(title),
-      content: Text(message),
+      content: Text(newMsg),
       actions: [
         okButton,
       ],
     );
 
-    // show the dialog
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -59,9 +53,10 @@ class _FragmentPengaturan extends State<FragmentPengaturan> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Column(
-              //  mainAxisAlignment: MainAxisAlignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center, 
+          children: [
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
@@ -88,7 +83,6 @@ class _FragmentPengaturan extends State<FragmentPengaturan> {
                     letterSpacing: 2,
                   ),
                 ),
-                //const SizedBox(height: 47.99),
                 TextField(
                   controller: pass1,
                   obscureText: true,
@@ -109,7 +103,6 @@ class _FragmentPengaturan extends State<FragmentPengaturan> {
                     letterSpacing: 2,
                   ),
                 ),
-                //const SizedBox(height: 47.99),
                 TextField(
                   controller: pass2,
                   obscureText: true,
@@ -121,27 +114,34 @@ class _FragmentPengaturan extends State<FragmentPengaturan> {
                 const SizedBox(
                   height: 88.0,
                 ),
-              ]),
+              ]
+            ),
           ElevatedButton(
-            //width: double.infinity,
-            onPressed: (() async {
-              if (pass1.text == pass2.text) {
-                updateData(password: pass1.text);
-                showAlertDialog(context);
+            onPressed: () async {
+              if (pass1.text == pass2.text && !isButtonDisabled) {
+                try {
+                  isButtonDisabled = true;
+                  await updateData(password: pass1.text);
+                  showAlertDialog(context, 'Sukses', 'Ubah password berhasil');
+                } catch (error) {
+                  showAlertDialog(context, 'Gagal', error.toString());
+                } finally {
+                  isButtonDisabled = false;
+                  clearText();
+                }
               } else {
-                title = "Warning";
-                message = "Update password gagal/password tidak sama";
-                showAlertDialog(context);
+                showAlertDialog(context, 'Gagal', 'Update password gagal / password tidak sama');
+                clearText();
               }
-              clearText();
-            }),
+            },
             child: Text("Submit",
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                   fontSize: 12.0,
                 )),
-          ),
-        ]),
+            ),
+          ]
+        ),
       ),
     );
   }
