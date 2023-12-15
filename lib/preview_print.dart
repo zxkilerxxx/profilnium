@@ -7,6 +7,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:profilnium/data_model.dart';
+import 'package:profilnium/menu.dart';
 import 'package:profilnium/penjualan.dart';
 
 class PreviewPrint extends StatefulWidget {
@@ -30,7 +31,17 @@ class _PreviewPrint extends State<PreviewPrint> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: Text('Print Preview')),
+        appBar: AppBar(
+          title: Text('Print Preview'),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              // Navigate back to the previous screen
+              Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => MenuScreen()));
+            },
+          ),
+        ),
         body: PdfPreview(
           build: (format) => _generatePdf(format, widget.invoice),
         ),
