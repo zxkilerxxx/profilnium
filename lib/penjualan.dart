@@ -641,7 +641,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                   SizedBox(height: 20),
                                   ElevatedButton(
                                     onPressed: () {
-                                      kirimInvoice();
+                                      printBluetooth();
                                       Navigator.of(context).pushReplacement(
                                           MaterialPageRoute(
                                               builder: (context) =>
