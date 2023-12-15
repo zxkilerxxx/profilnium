@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:firedart/auth/user_gateway.dart';
+import 'package:profilnium/menu_user.dart';
 import 'package:profilnium/services/firebase_auth_service.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -79,6 +81,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  User? user;
   final query = Firestore.instance.collection("user");
   FirebaseAuthService _firebaseAuthService = FirebaseAuthService();
   Future<bool> loginUser(
@@ -88,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
         await query.where("username", isEqualTo: userName).get();
       for (var docSnapshot in querySnapshot) {
         if (password == docSnapshot["password"].toString()) {
-          if (userName == "admin") {
+          if (userName == "") {
             _firebaseAuthService.signOut();
             await _firebaseAuthService.signIn("admin@admin.com", "abcabc123");
           } else if (userName == "user") {
@@ -209,8 +212,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (await loginUser(
                       userName: emailController.text,
                       password: passwordController.text)) {
-                        Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => MenuScreen()));
+                        user = await FirebaseAuth.instance.getUser();
+                        if(user?.email == 'admin@admin.com') {
+                          Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(builder: (context) => MenuScreen()));
+                        } else {
+                          Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(builder: (context) => MenuUserScreen()));
+                        }
+                        
                   } else {
                     showAlertDialog(context, 'Gagal', 'Username/password salah');
                   }
