@@ -56,10 +56,12 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
     searchResults = List.from(items);
     _selectedItem = _items[0];
   }
+
   Future<List<Document>> getData() async {
     List<Document> document = await Firestore.instance.collection('data').get();
     return document;
   }
+
   Future<void> fetchData() async {
     List<Document> database = await getData();
     for (Document doc in database) {
@@ -97,6 +99,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
       });
     }
   }
+
   Future<void> generatePDFInvoice(String noNota, String namaPembeli,
       String alamatPembeli, String pembayaran) async {
     final pdf = pw.Document();
@@ -220,6 +223,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
     // await launch(file.path);
     await OpenFile.open(file.path);
   }
+
   Future<void> _generateInvoiceAndPDF() async {
     String noNota = nomor.text;
     String namaPembeli = nama.text;
@@ -229,6 +233,11 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
   }
 
   void saveInvoice() async {
+    if (_dateController.text.isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('MOHON ISI DATA DENGAN BENAR')));
+      return;
+    }
     grandTotal = 0;
     for (Item sold in selectedItems) {
       int sisaStok = sold.sisaStokDb - sold.jumlah;
@@ -262,6 +271,48 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
     refresh();
   }
 
+  void printBluetooth() async {
+    grandTotal = 0;
+    for (Item sold in selectedItems) {
+      int sisaStok = sold.sisaStokDb - sold.jumlah;
+      if (sisaStok < 0) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Stok tidak cukup')));
+        return;
+      }
+    }
+    for (Item sold in selectedItems) {
+      grandTotal = grandTotal + sold.total;
+      int sisaStok = sold.sisaStokDb - sold.jumlah;
+      await Firestore.instance
+          .collection('data')
+          .document(sold.id)
+          .update({'Jumlah': sisaStok});
+    }
+    invoiceData = {
+      'Nomor': nomor.text,
+      'Nama': nama.text,
+      'Alamat': alamat.text,
+      'Tanggal': _dateController.text,
+      'Pembayaran': _selectedItem,
+      'JenisTerjual': selectedItems.length,
+      'grandTotal': grandTotal,
+    };
+    await Firestore.instance
+        .collection('invoice')
+        .add({}).then((value) async => await addItem(value.id, selectedItems));
+
+    invoice = Invoice(
+        barang: selectedItems,
+        tanggal: _dateController.text,
+        grandTotal: grandTotal);
+
+    Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) => PreviewPrint(invoice: invoice)));
+
+    refresh();
+  }
+
   Future<void> addItem(String id, List<Item> data) async {
     data.asMap().forEach((index, e) {
       invoiceData['IdBarang$index'] = e.id;
@@ -288,22 +339,6 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
       _controller.clear();
       jumlahTerjual.clear();
     });
-  }
-
-  void kirimInvoice() {
-    for (Item sold in selectedItems) {
-      grandTotal = grandTotal + sold.total;
-      int sisaStok = sold.sisaStokDb - sold.jumlah;
-      if (sisaStok < 0) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Stok tidak cukup')));
-        return;
-      }
-    }
-    invoice = Invoice(
-        barang: selectedItems,
-        tanggal: _dateController.text,
-        grandTotal: grandTotal);
   }
 
   @override
@@ -345,7 +380,8 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                 children: [
                                   Row(
                                     mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         crossAxisAlignment:
@@ -371,13 +407,15 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                                   controller: nomor,
                                                   decoration:
                                                       const InputDecoration(
-                                                    hintText: "Masukkan No Nota",
+                                                    hintText:
+                                                        "Masukkan No Nota",
                                                     hintStyle:
                                                         TextStyle(fontSize: 12),
                                                     border:
                                                         OutlineInputBorder(), // Adding border for better visibility
                                                   ),
-                                                  style: TextStyle(fontSize: 12),
+                                                  style:
+                                                      TextStyle(fontSize: 12),
                                                 ),
                                               ),
                                             ],
@@ -411,9 +449,11 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                                     hintText: "Select Date",
                                                     hintStyle:
                                                         TextStyle(fontSize: 12),
-                                                    border: OutlineInputBorder(),
+                                                    border:
+                                                        OutlineInputBorder(),
                                                   ),
-                                                  style: TextStyle(fontSize: 12),
+                                                  style:
+                                                      TextStyle(fontSize: 12),
                                                 ),
                                               ),
                                             ],
@@ -428,7 +468,8 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                   SizedBox(height: 20),
                                   Row(
                                     mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Column(
                                         children: [
@@ -540,7 +581,8 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                           searchResults = items
                                               .where((item) => item.name
                                                   .toLowerCase()
-                                                  .contains(value.toLowerCase()))
+                                                  .contains(
+                                                      value.toLowerCase()))
                                               .toList();
                                         });
                                       },
@@ -563,8 +605,8 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                                       searchResults[index])) {
                                                 selectedItems
                                                     .add(searchResults[index]);
-                                                searchResults
-                                                    .remove(searchResults[index]);
+                                                searchResults.remove(
+                                                    searchResults[index]);
                                                 _controller
                                                     .clear(); // Clear search query after selection
                                               } else {
@@ -599,11 +641,12 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                   SizedBox(height: 20),
                                   ElevatedButton(
                                     onPressed: () {
-                                      kirimInvoice();
+                                      printBluetooth();
                                       Navigator.of(context).pushReplacement(
                                           MaterialPageRoute(
-                                              builder: (context) => PreviewPrint(
-                                                  invoice: invoice)));
+                                              builder: (context) =>
+                                                  PreviewPrint(
+                                                      invoice: invoice)));
                                     },
                                     child: Text('Cetak'),
                                   ),
@@ -654,7 +697,8 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                           setState(() {
                                             item.jumlah =
                                                 int.tryParse(newValue) ?? 1;
-                                            item.total = item.jumlah * item.harga;
+                                            item.total =
+                                                item.jumlah * item.harga;
                                           });
                                         },
                                       ),

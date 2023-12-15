@@ -11,7 +11,8 @@ import 'package:profilnium/menu.dart';
 import 'package:profilnium/services/utility_service.dart';
 
 void main() {
-  FirebaseAuth.initialize(DefaultFirebaseOptions.currentPlatform.apiKey, VolatileStore());
+  FirebaseAuth.initialize(
+      DefaultFirebaseOptions.currentPlatform.apiKey, VolatileStore());
   Firestore.initialize(DefaultFirebaseOptions.currentPlatform.projectId);
   runApp(MyApp());
 }
@@ -35,41 +36,36 @@ class _MyAppState extends State<MyApp> {
 
   checkConnection() {
     _utilityService.checkConnectivity().then((value) => {
-      if (value != _isOnline)
-        {
-          setState(() {
-            _isOnline = value;
-          })
-        }
-    });
+          if (value != _isOnline)
+            {
+              setState(() {
+                _isOnline = value;
+              })
+            }
+        });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Profilnium',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF0080FF)),
-      ),
-      home: _isOnline
-        ? LoginScreen()
-        : Scaffold(
-          body: Center(
-            child: Column(
-              children: [
+        debugShowCheckedModeBanner: false,
+        title: 'Profilnium',
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF0080FF)),
+        ),
+        home: _isOnline
+            ? LoginScreen()
+            : Scaffold(
+                body: Center(
+                    child: Column(children: [
                 LoadingAnimationWidget.staggeredDotsWave(
                   color: Theme.of(context).colorScheme.primary,
                   size: 50.0,
                 ),
                 SizedBox(height: 50),
                 Text("Tidak ada koneksi internet")
-              ]
-            )
-          )
-        )
-    );
+              ]))));
   }
 }
 
@@ -88,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
       {required String userName, required String password}) async {
     try {
       var querySnapshot =
-        await query.where("username", isEqualTo: userName).get();
+          await query.where("username", isEqualTo: userName).get();
       for (var docSnapshot in querySnapshot) {
         if (password == docSnapshot["password"].toString()) {
           if (userName == "") {
@@ -212,17 +208,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (await loginUser(
                       userName: emailController.text,
                       password: passwordController.text)) {
-                        user = await FirebaseAuth.instance.getUser();
-                        if(user?.email == 'admin@admin.com') {
-                          Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(builder: (context) => MenuScreen()));
-                        } else {
-                          Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(builder: (context) => MenuUserScreen()));
-                        }
-                        
+                    user = await FirebaseAuth.instance.getUser();
+                    if (user?.email == 'admin@admin.com') {
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
+                          builder: (context) => MenuScreen()));
+                    } else {
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
+                          builder: (context) => MenuUserScreen()));
+                    }
                   } else {
-                    showAlertDialog(context, 'Gagal', 'Username/password salah');
+                    showAlertDialog(
+                        context, 'Gagal', 'Username/password salah');
                   }
                 },
                 child: const Text("Login",
