@@ -55,6 +55,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
     fetchData();
     searchResults = List.from(items);
     _selectedItem = _items[0];
+    print('ler');
   }
 
   Future<List<Document>> getData() async {
