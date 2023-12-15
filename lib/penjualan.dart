@@ -7,6 +7,8 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 import 'package:intl/intl.dart';
+import 'package:profilnium/data_model.dart';
+import 'package:profilnium/preview_print.dart';
 
 class FragmentPenjualan extends StatefulWidget {
   @override
@@ -21,7 +23,6 @@ class Item {
   int jumlah;
   int harga;
   int total;
-  TextEditingController jumlahController;
 
   Item({
     required this.id,
@@ -31,10 +32,11 @@ class Item {
     required this.jumlah,
     required this.harga,
     required this.total,
-  }) : jumlahController = TextEditingController(text: jumlah.toString());
+  });
 }
 
 class _FragmentPenjualan extends State<FragmentPenjualan> {
+  final currencyFormat = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp');
   TextEditingController jumlahTerjual = TextEditingController();
   int total = 0;
   int grandTotal = 0;
@@ -44,6 +46,8 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
   List<Item> searchResults = [];
   String? _selectedItem;
   List<String> _items = ['CASH', 'TENOR'];
+  Map<String, dynamic> invoiceData = {};
+  Invoice invoice = Invoice(barang: [], grandTotal: 0, tanggal: '');
 
   @override
   void initState() {
@@ -62,15 +66,14 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
     List<Document> database = await getData();
     for (Document doc in database) {
       total = int.parse(doc['HargaJual']);
-      print(doc['Jumlah'].toString() + doc['NamaProduk']);
       items.add(Item(
-        id: doc.id,
-        name: doc['NamaProduk'],
-        warna: doc['warna'],
-        sisaStokDb: doc['Jumlah'],
-        jumlah: 1,
-        harga: int.parse(doc['HargaJual']),
-        total: total));
+          id: doc.id,
+          name: doc['NamaProduk'],
+          warna: doc['warna'],
+          sisaStokDb: doc['Jumlah'],
+          jumlah: 1,
+          harga: int.parse(doc['HargaJual']),
+          total: total));
     }
     setState(() {
       searchResults = List.from(items);
@@ -108,57 +111,52 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Header(
-                level: 0,
-                child: pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Row(
+              pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Text('ProfilNium', style: pw.TextStyle(fontSize: 20)),
+                      pw.Text(
+                        _dateController.text,
+                        style: pw.TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                  pw.Row(
                       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                       children: [
-                        pw.Text('ProfilNium',
-                            style: pw.TextStyle(fontSize: 20)),
-                        pw.Text(
-                          _dateController.text,
-                          style: pw.TextStyle(fontSize: 12),
+                        pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.start,
+                            children: [
+                              pw.Text(
+                                'Supplier Aluminium',
+                                style: pw.TextStyle(fontSize: 12),
+                              ),
+                              pw.Text(
+                                'Aluminium Extrusion, Aluminium & \n Glass Accessories, Glass Work',
+                                style: pw.TextStyle(fontSize: 8),
+                              ),
+                              pw.Text(
+                                'HP/WA : 0812 5737 395 \nJL. Trans Kalimantan-Ambawang',
+                                style: pw.TextStyle(fontSize: 12),
+                              ),
+                            ]),
+                        pw.Center(
+                          child: pw.Text(
+                            'Invoice',
+                            style: pw.TextStyle(
+                                fontSize: 20, fontWeight: pw.FontWeight.bold),
+                          ),
                         ),
-                      ],
-                    ),
-                    pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                        children: [
-                          pw.Column(
-                              crossAxisAlignment: pw.CrossAxisAlignment.start,
-                              children: [
-                                pw.Text(
-                                  'Supplier Aluminium',
-                                  style: pw.TextStyle(fontSize: 12),
-                                ),
-                                pw.Text(
-                                  'Aluminium Extrusion, Aluminium & \n Glass Accessories, Glass Work',
-                                  style: pw.TextStyle(fontSize: 8),
-                                ),
-                                pw.Text(
-                                  'HP/WA : 0812 5737 395 \nJL. Trans Kalimantan-Ambawang',
-                                  style: pw.TextStyle(fontSize: 12),
-                                ),
-                              ]),
-                          pw.Center(
-                            child: pw.Text(
-                              'Invoice',
-                              style: pw.TextStyle(
-                                  fontSize: 20, fontWeight: pw.FontWeight.bold),
-                            ),
-                          ),
-                          pw.Text(
-                            'No Nota: $noNota \nDitujukan kepada: $namaPembeli \nAlamat Pembeli: $alamatPembeli \nJenis Pembayaran: $pembayaran',
-                            style: pw.TextStyle(fontSize: 8),
-                          ),
-                        ])
-                  ],
-                ),
+                        pw.Text(
+                          'No Nota: $noNota \nDitujukan kepada: $namaPembeli \nAlamat Pembeli: $alamatPembeli \nJenis Pembayaran: $pembayaran',
+                          style: pw.TextStyle(fontSize: 8),
+                        ),
+                      ])
+                ],
               ),
-              pw.SizedBox(height: 20),
               pw.TableHelper.fromTextArray(
                 border: pw.TableBorder.all(),
                 headers: <String>['Nama', 'Warna', 'Harga', 'Jumlah', 'Total'],
@@ -172,7 +170,10 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                   ];
                 }).toList(),
               ),
-              pw.Align(alignment: pw.Alignment.topRight, child: pw.Text('Grand Total: $grandTotal')),
+              pw.Align(
+                  alignment: pw.Alignment.topRight,
+                  child: pw.Text(
+                      'Grand Total: ${currencyFormat.format(grandTotal)}')),
               pw.SizedBox(height: 20),
               pw.Row(
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -241,13 +242,45 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
 
   void saveInvoice() async {
     grandTotal = 0;
-    for(Item sold in selectedItems) {
+    for (Item sold in selectedItems) {
+      int sisaStok = sold.sisaStokDb - sold.jumlah;
+      if (sisaStok < 0) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Stok tidak cukup')));
+        return;
+      }
+    }
+    for (Item sold in selectedItems) {
       grandTotal = grandTotal + sold.total;
-      int sisaStok = sold.sisaStokDb-sold.jumlah;
-      await Firestore.instance.collection('data').document(sold.id).update({'Jumlah': sisaStok});
+      int sisaStok = sold.sisaStokDb - sold.jumlah;
+      await Firestore.instance
+          .collection('data')
+          .document(sold.id)
+          .update({'Jumlah': sisaStok});
     }
     await _generateInvoiceAndPDF();
+    invoiceData = {
+      'Nomor': nomor.text,
+      'Nama': nama.text,
+      'Alamat': alamat.text,
+      'Tanggal': _dateController.text,
+      'Pembayaran': _selectedItem,
+      'JenisTerjual': selectedItems.length,
+      'grandTotal': grandTotal,
+    };
+    await Firestore.instance
+        .collection('invoice')
+        .add({}).then((value) async => await addItem(value.id, selectedItems));
     refresh();
+  }
+
+  Future<void> addItem(String id, List<Item> data) async {
+    data.asMap().forEach((index, e) {
+      invoiceData['IdBarang$index'] = e.id;
+      invoiceData['JumlahTerjual$index'] = e.jumlah;
+      invoiceData['HargaJual$index'] = e.harga;
+    });
+    await Firestore.instance.document('invoice/$id').set(invoiceData);
   }
 
   void refresh() async {
@@ -257,16 +290,32 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
     await fetchData();
     searchResults = List.from(items);
     _selectedItem = _items[0];
-    
-    print('peler');
+    invoiceData = {};
+
     setState(() {
       nomor.clear();
       _dateController.clear();
       nama.clear();
-      alamat.clear;
+      alamat.clear();
       _controller.clear();
       jumlahTerjual.clear();
     });
+  }
+
+  void kirimInvoice() {
+    for (Item sold in selectedItems) {
+      grandTotal = grandTotal + sold.total;
+      int sisaStok = sold.sisaStokDb - sold.jumlah;
+      if (sisaStok < 0) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Stok tidak cukup')));
+        return;
+      }
+    }
+    invoice = Invoice(
+        barang: selectedItems,
+        tanggal: _dateController.text,
+        grandTotal: grandTotal);
   }
 
   @override
@@ -456,11 +505,13 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                         SizedBox(
                                           width: 180.0,
                                           height: 55.0,
-                                          child: DropdownButtonFormField<String>(
+                                          child:
+                                              DropdownButtonFormField<String>(
                                             value: _selectedItem,
                                             items: _items.map((String value) {
                                               return DropdownMenuItem<String>(
-                                                value: value, // Ensure each value is unique
+                                                value:
+                                                    value, // Ensure each value is unique
                                                 child: Text(value),
                                               );
                                             }).toList(),
@@ -470,9 +521,9 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                               });
                                             },
                                             decoration: InputDecoration(
-                                              border: OutlineInputBorder(),
-                                              hintStyle: TextStyle(fontSize: 12)
-                                            ),
+                                                border: OutlineInputBorder(),
+                                                hintStyle:
+                                                    TextStyle(fontSize: 12)),
                                           ),
                                         ),
                                       ],
@@ -500,8 +551,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                         searchResults = items
                                             .where((item) => item.name
                                                 .toLowerCase()
-                                                .contains(
-                                                    value.toLowerCase()))
+                                                .contains(value.toLowerCase()))
                                             .toList();
                                       });
                                     },
@@ -524,8 +574,8 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                                     searchResults[index])) {
                                               selectedItems
                                                   .add(searchResults[index]);
-                                              searchResults.remove(
-                                                  searchResults[index]);
+                                              searchResults
+                                                  .remove(searchResults[index]);
                                               _controller
                                                   .clear(); // Clear search query after selection
                                             } else {
@@ -559,8 +609,12 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                 ),
                                 SizedBox(height: 20),
                                 ElevatedButton(
-                                  onPressed: () async {
-                                    await _generateInvoiceAndPDF();
+                                  onPressed: () {
+                                    kirimInvoice();
+                                    Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(
+                                            builder: (context) => PreviewPrint(
+                                                invoice: invoice)));
                                   },
                                   child: Text('Cetak'),
                                 ),
@@ -593,7 +647,8 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                             DataColumn(label: Text('Total')),
                             DataColumn(label: Text('Hapus')),
                           ],
-                          rows: selectedItems.map(
+                          rows: selectedItems
+                              .map(
                                 (item) => DataRow(cells: [
                                   DataCell(Text(item.name)),
                                   DataCell(Text(item.warna)),
@@ -603,11 +658,13 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                     TextFormField(
                                       keyboardType: TextInputType.number,
                                       inputFormatters: <TextInputFormatter>[
-                                        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                                        FilteringTextInputFormatter.allow(
+                                            RegExp(r'[0-9]')),
                                       ],
                                       onChanged: (newValue) {
                                         setState(() {
-                                          item.jumlah = int.tryParse(newValue) ?? 1;
+                                          item.jumlah =
+                                              int.tryParse(newValue) ?? 1;
                                           item.total = item.jumlah * item.harga;
                                         });
                                       },
