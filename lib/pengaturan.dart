@@ -126,7 +126,7 @@ class _FragmentPengaturan extends State<FragmentPengaturan> {
             //width: double.infinity,
             onPressed: (() async {
               if (pass1.text == pass2.text) {
-                updateData(password: pass1.text);
+                await updateData(password: pass1.text);
                 showAlertDialog(context);
               } else {
                 title = "Warning";

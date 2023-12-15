@@ -1,6 +1,5 @@
 import 'package:firedart/firedart.dart';
 import 'package:flutter/material.dart';
-import 'package:profilnium/home.dart';
 import 'package:profilnium/invoice.dart';
 import 'package:profilnium/main.dart';
 import 'package:profilnium/stok.dart';
@@ -8,12 +7,14 @@ import 'package:profilnium/pembelian.dart';
 import 'package:profilnium/penjualan.dart';
 import 'package:profilnium/pengaturan.dart';
 
-class MenuScreen extends StatefulWidget {
+class MenuUserScreen extends StatefulWidget {
+  const MenuUserScreen({super.key});
+
   @override
-  State<MenuScreen> createState() => _MenuScreenState();
+  State<MenuUserScreen> createState() => _MenuUserScreenState();
 }
 
-class _MenuScreenState extends State<MenuScreen> {
+class _MenuUserScreenState extends State<MenuUserScreen> {
   var selectedIndex = 0;
 
   @override
@@ -34,24 +35,21 @@ class _MenuScreenState extends State<MenuScreen> {
     Widget page;
     switch (selectedIndex) {
       case 0:
-        page = FragmentHome();
-        break;
-      case 1:
         page = FragmentStok();
         break;
-      case 2:
+      case 1:
         page = FragmentPembelian();
         break;
-      case 3:
+      case 2:
         page = FragmentPenjualan();
         break;
-      case 4:
+      case 3:
         page = FragmentInvoice();
         break;
-      case 5:
+      case 4:
         page = FragmentPengaturan();
         break;
-      case 6:
+      case 5:
         keluar();
         return Container();
       default:
@@ -78,10 +76,6 @@ class _MenuScreenState extends State<MenuScreen> {
                       backgroundColor: colorScheme.surfaceVariant,
                       extended: true,
                       destinations: [
-                        NavigationRailDestination(
-                          icon: Icon(Icons.home),
-                          label: Text("Home"),
-                        ),
                         NavigationRailDestination(
                           icon: Icon(Icons.all_inbox),
                           label: Text("Stok"),
