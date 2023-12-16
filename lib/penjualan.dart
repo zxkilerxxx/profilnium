@@ -155,7 +155,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                         ),
                         pw.Text(
                           'No Nota: $noNota \nDitujukan kepada: $namaPembeli \nAlamat Pembeli: $alamatPembeli \nJenis Pembayaran: $pembayaran',
-                          style: pw.TextStyle(fontSize: 8),
+                          style: pw.TextStyle(fontSize: 12),
                         ),
                       ])
                 ],
@@ -193,7 +193,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                         ),
                       ),
                     ),
-                    child: pw.Center(child: pw.Text('Signature 1')),
+                    child: pw.Center(child: pw.Text('TANDA TERIMA')),
                   ),
                   pw.Text(
                     'PERHATIAN!!!\nBarang  yang sudah dibeli tidak\ndapat ditukar atau dikembalikan',
@@ -211,7 +211,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                         ),
                       ),
                     ),
-                    child: pw.Center(child: pw.Text('Signature 2')),
+                    child: pw.Center(child: pw.Text('HORMAT KAMI,')),
                   ),
                 ],
               ),
@@ -277,6 +277,11 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
   }
 
   void printBluetooth() async {
+    if (_dateController.text.isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('MOHON ISI DATA DENGAN BENAR')));
+      return;
+    }
     grandTotal = 0;
     for (Item sold in selectedItems) {
       int sisaStok = sold.sisaStokDb - sold.jumlah;
@@ -647,11 +652,6 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                   ElevatedButton(
                                     onPressed: () {
                                       printBluetooth();
-                                      Navigator.of(context).pushReplacement(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  PreviewPrint(
-                                                      invoice: invoice)));
                                     },
                                     child: Text('Cetak'),
                                   ),

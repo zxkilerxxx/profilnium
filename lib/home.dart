@@ -79,6 +79,7 @@ class _FragmentHome extends State<FragmentHome> {
       num total = document['grandTotal'];
       grandTotalThisYear = grandTotalThisYear + total.toInt();
     }
+    setState(() {});
   }
 
 

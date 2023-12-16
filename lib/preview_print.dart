@@ -149,7 +149,7 @@ class _PreviewPrint extends State<PreviewPrint> {
                               pw.Expanded(
                                 flex: 3,
                                 child: pw.Text(
-                                  barangJual[index].name,
+                                  barangJual[index].name + barangJual[index].warna,
                                   style: pw.TextStyle(fontSize: 12),
                                 ),
                               ),
@@ -188,7 +188,7 @@ class _PreviewPrint extends State<PreviewPrint> {
                       pw.Divider(thickness: 1, color: PdfColors.grey),
                       pw.Center(
                         child: pw.Text(
-                          'Barang TIDAK DAPAT ditukar/dikembalikan\n dengan ALASAN APAPUN. Sebelum dibayar silahkan\n dilakukan pengecekan terlebih dahulu, kerusakan barang\n bukan tanggung jawab kami.',
+                          'PERHATIAN!!!\n Barang-barang yang sudah dibeli\ntidak dapat ditukar atau\ndikembalikan, kecuali ada\nperjanjian terlebih dahulu',
                           style: pw.TextStyle(fontSize: 8),
                           textAlign: pw.TextAlign.center,
                         ),
