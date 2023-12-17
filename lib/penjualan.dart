@@ -647,11 +647,6 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                   ElevatedButton(
                                     onPressed: () {
                                       printBluetooth();
-                                      Navigator.of(context).pushReplacement(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  PreviewPrint(
-                                                      invoice: invoice)));
                                     },
                                     child: Text('Cetak'),
                                   ),

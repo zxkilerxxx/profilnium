@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
           await query.where("username", isEqualTo: userName).get();
       for (var docSnapshot in querySnapshot) {
         if (password == docSnapshot["password"].toString()) {
-          if (userName == "") {
+          if (userName == "admin") {
             _firebaseAuthService.signOut();
             await _firebaseAuthService.signIn("admin@admin.com", "abcabc123");
           } else if (userName == "user") {
@@ -188,10 +188,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(
               height: 12.0,
-            ),
-            const Text(
-              "Lupa password?",
-              style: TextStyle(color: Colors.blue),
             ),
             const SizedBox(
               height: 88.0,
