@@ -97,7 +97,12 @@ class _LoginScreenState extends State<LoginScreen> {
           }
           return true;
         } else {
-          showAboutDialog(context: context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'Username / password salah'),
+            ),
+          );
           return false;
         }
       }
@@ -113,32 +118,6 @@ class _LoginScreenState extends State<LoginScreen> {
     _firebaseAuthService.signIn("aplikasi@aplikasi.com", "abcabc123");
     TextEditingController emailController = TextEditingController();
     TextEditingController passwordController = TextEditingController();
-
-    showAlertDialog(BuildContext context, String title, String message) {
-      Widget okButton = TextButton(
-        child: Text("OK"),
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-      );
-
-      // set up the AlertDialog
-      AlertDialog alert = AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          okButton,
-        ],
-      );
-
-      // show the dialog
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return alert;
-        },
-      );
-    }
 
     return Scaffold(
         body: Center(
@@ -213,8 +192,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           builder: (context) => MenuUserScreen()));
                     }
                   } else {
-                    showAlertDialog(
-                        context, 'Gagal', 'Username/password salah');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                            'Username / password salah'),
+                      ),
+                    );
                   }
                 },
                 child: const Text("Login",

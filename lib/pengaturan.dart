@@ -27,33 +27,6 @@ class _FragmentPengaturan extends State<FragmentPengaturan> {
     title = "Sukses";
   }
 
-  showAlertDialog(BuildContext context) {
-    // set up the button
-    Widget okButton = TextButton(
-      child: Text("OK"),
-      onPressed: () {
-        Navigator.of(context).pop();
-      },
-    );
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text(title),
-      content: Text(message),
-      actions: [
-        okButton,
-      ],
-    );
-
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,11 +100,23 @@ class _FragmentPengaturan extends State<FragmentPengaturan> {
             onPressed: (() async {
               if (pass1.text == pass2.text) {
                 await updateData(password: pass1.text);
-                showAlertDialog(context);
+                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                        'password berhasil diubah'),
+                                                  ),
+                                                );
               } else {
                 title = "Warning";
                 message = "Update password gagal/password tidak sama";
-                showAlertDialog(context);
+                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                        'Update password gagal / password tidak sama'),
+                                                  ),
+                                                );
               }
               clearText();
             }),

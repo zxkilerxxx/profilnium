@@ -37,7 +37,7 @@ class _FragmentInvoice extends State<FragmentInvoice> {
   }
 
   Future<void> deleteDocument(Document doc) async {
-    await Firestore.instance.collection('invoice').document(doc.id).delete();
+    await Firestore.instance.collection('invoice').document(doc.id).update({"Pembayaran": "CASH"});
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getData();
     });

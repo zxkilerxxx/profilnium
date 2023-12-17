@@ -1,4 +1,5 @@
 {
     "cmake.configureOnOpen": true,
-    "java.jdt.ls.java.home": "C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.1.12-hotspot"
+    "java.jdt.ls.java.home": "C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.1.12-hotspot",
+    "cmake.sourceDirectory": "D:/Project/profilnium/build/windows/x64/extracted/firebase_cpp_sdk_windows"
 }
