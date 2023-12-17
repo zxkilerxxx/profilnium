@@ -102,7 +102,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
     if (picked != null) {
       setState(() {
         _selectedDate = picked;
-        _dateController.text = DateFormat('dd-MM-yyyy').format(_selectedDate!);
+        _dateController.text = DateFormat('dd-MM-yyyy').format(_selectedDate);
       });
     }
   }
