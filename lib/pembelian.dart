@@ -25,6 +25,12 @@ class _FragmentPembelian extends State<FragmentPembelian> {
       required hargajual,
       required jumlah,
       required warna}) async {
+    if (jumlah.toString().isEmpty) {
+      jumlah = 0;
+    }
+    if (hargajual.toString().isEmpty) {
+      hargajual = '0';
+    }
     var collRef = Firestore.instance.collection('data');
     collRef.add({
       'NamaProduk': namaproduk,

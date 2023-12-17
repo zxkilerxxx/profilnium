@@ -1,7 +1,4 @@
-// ignore_for_file: public_member_api_docs
-
 import 'dart:typed_data';
-
 import 'package:firedart/auth/user_gateway.dart';
 import 'package:firedart/firedart.dart';
 import 'package:flutter/material.dart';
@@ -31,10 +28,8 @@ class ReceiveData {
 
 class _PreviewPrint extends State<PreviewPrint> {
   String _formatCurrency(int amount) {
-    // Convert the amount to a string
     String formattedAmount = amount.toString();
 
-    // Add dots as thousand separators
     final RegExp regExp = RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
     formattedAmount = formattedAmount.replaceAllMapped(
         regExp, (Match match) => '${match[1]}.');
@@ -118,23 +113,23 @@ class _PreviewPrint extends State<PreviewPrint> {
                             child: pw.Text(
                               'Item Names',
                               style: pw.TextStyle(
-                                  fontSize: 12, fontWeight: pw.FontWeight.bold),
-                            ),
-                          ),
-                          pw.Expanded(
-                            flex: 2,
-                            child: pw.Text(
-                              'Qty',
-                              style: pw.TextStyle(
-                                  fontSize: 12, fontWeight: pw.FontWeight.bold),
+                                  fontSize: 8, fontWeight: pw.FontWeight.bold),
                             ),
                           ),
                           pw.Expanded(
                             flex: 1,
                             child: pw.Text(
+                              'Qty',
+                              style: pw.TextStyle(
+                                  fontSize: 8, fontWeight: pw.FontWeight.bold),
+                            ),
+                          ),
+                          pw.Expanded(
+                            flex: 2,
+                            child: pw.Text(
                               'Prices',
                               style: pw.TextStyle(
-                                  fontSize: 12, fontWeight: pw.FontWeight.bold),
+                                  fontSize: 8, fontWeight: pw.FontWeight.bold),
                             ),
                           ),
                         ],
@@ -149,22 +144,23 @@ class _PreviewPrint extends State<PreviewPrint> {
                               pw.Expanded(
                                 flex: 3,
                                 child: pw.Text(
-                                  barangJual[index].name + barangJual[index].warna,
-                                  style: pw.TextStyle(fontSize: 12),
-                                ),
-                              ),
-                              pw.Expanded(
-                                flex: 2,
-                                child: pw.Text(
-                                  barangJual[index].jumlah.toString(),
-                                  style: pw.TextStyle(fontSize: 12),
+                                  barangJual[index].name +
+                                      barangJual[index].warna,
+                                  style: pw.TextStyle(fontSize: 8),
                                 ),
                               ),
                               pw.Expanded(
                                 flex: 1,
                                 child: pw.Text(
+                                  barangJual[index].jumlah.toString(),
+                                  style: pw.TextStyle(fontSize: 8),
+                                ),
+                              ),
+                              pw.Expanded(
+                                flex: 2,
+                                child: pw.Text(
                                   barangJual[index].harga.toString(),
-                                  style: pw.TextStyle(fontSize: 12),
+                                  style: pw.TextStyle(fontSize: 8),
                                 ),
                               ),
                             ],
@@ -176,7 +172,7 @@ class _PreviewPrint extends State<PreviewPrint> {
                         mainAxisAlignment: pw.MainAxisAlignment.end,
                         children: [
                           pw.Text(
-                            'Grand Total: ',
+                            'Total: ',
                             style: pw.TextStyle(fontSize: 12),
                           ),
                           pw.Text(

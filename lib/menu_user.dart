@@ -2,7 +2,7 @@ import 'package:firedart/firedart.dart';
 import 'package:flutter/material.dart';
 import 'package:profilnium/invoice.dart';
 import 'package:profilnium/main.dart';
-import 'package:profilnium/stok.dart';
+import 'package:profilnium/stok_user.dart';
 import 'package:profilnium/pembelian.dart';
 import 'package:profilnium/penjualan.dart';
 import 'package:profilnium/pengaturan.dart';
@@ -36,7 +36,7 @@ class _MenuUserScreenState extends State<MenuUserScreen> {
     Widget page;
     switch (selectedIndex) {
       case 0:
-        page = FragmentStok();
+        page = FragmentStokUser();
         break;
       case 1:
         page = FragmentPembelian();

@@ -31,13 +31,16 @@ class _FragmentInvoice extends State<FragmentInvoice> {
   Future<void> getData() async {
     data = await Firestore.instance
         .collection('invoice')
-        .where("Pembayaran", isEqualTo: "TENOR")
+        .where("Pembayaran", isEqualTo: "TEMPO")
         .get();
     setState(() {});
   }
 
   Future<void> deleteDocument(Document doc) async {
-    await Firestore.instance.collection('invoice').document(doc.id).update({"Pembayaran": "CASH"});
+    await Firestore.instance
+        .collection('invoice')
+        .document(doc.id)
+        .update({"Pembayaran": "CASH"});
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getData();
     });
@@ -91,7 +94,7 @@ class _FragmentInvoice extends State<FragmentInvoice> {
                   SizedBox(
                     width: double.infinity,
                     child: PaginatedDataTable(
-                      header: Text('List Tenor'),
+                      header: Text('List Tempo'),
                       rowsPerPage: 7,
                       source: MyDataTableSource(data, deleteDocument),
                       columns: <DataColumn>[
@@ -122,7 +125,7 @@ class _FragmentInvoice extends State<FragmentInvoice> {
                         DataColumn(
                           label: Expanded(
                             child: Text(
-                              'Sisa waktu tenor',
+                              'Sisa waktu tempo',
                               style: TextStyle(fontStyle: FontStyle.italic),
                             ),
                           ),

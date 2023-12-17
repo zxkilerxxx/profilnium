@@ -23,6 +23,7 @@ class Item {
   int jumlah;
   int harga;
   int total;
+  int diskon;
 
   Item({
     required this.id,
@@ -32,20 +33,25 @@ class Item {
     required this.jumlah,
     required this.harga,
     required this.total,
+    required this.diskon,
   });
 }
 
 class _FragmentPenjualan extends State<FragmentPenjualan> {
   final currencyFormat = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp');
   TextEditingController jumlahTerjual = TextEditingController();
+  TextEditingController diskon = TextEditingController();
   int total = 0;
   int grandTotal = 0;
+  int page1grandtotal = 0;
+  int page2grandtotal = 0;
+  int page3grandtotal = 0;
   TextEditingController _controller = TextEditingController();
   List<Item> items = [];
   List<Item> selectedItems = [];
   List<Item> searchResults = [];
   String? _selectedItem;
-  List<String> _items = ['CASH', 'TENOR'];
+  List<String> _items = ['CASH', 'TEMPO'];
   Map<String, dynamic> invoiceData = {};
   Invoice invoice = Invoice(barang: [], grandTotal: 0, tanggal: '');
 
@@ -72,6 +78,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
           warna: doc['warna'],
           sisaStokDb: doc['Jumlah'],
           jumlah: 1,
+          diskon: 0,
           harga: int.parse(doc['HargaJual']),
           total: total));
     }
@@ -84,7 +91,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
   final nomor = TextEditingController();
   final nama = TextEditingController();
   final alamat = TextEditingController();
-  DateTime? _selectedDate;
+  DateTime _selectedDate = DateTime.now();
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -95,131 +102,729 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
     if (picked != null) {
       setState(() {
         _selectedDate = picked;
-        _dateController.text = DateFormat('yyyy-MM-dd').format(_selectedDate!);
+        _dateController.text = DateFormat('dd-MM-yyyy').format(_selectedDate!);
       });
     }
-  }
-
-  String _getFormattedDate() {
-    final now = DateTime.now();
-    return '${now.year}/${now.month}/${now.day}';
   }
 
   Future<void> generatePDFInvoice(String noNota, String namaPembeli,
       String alamatPembeli, String pembayaran) async {
     final pdf = pw.Document();
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.Text('ProfilNium', style: pw.TextStyle(fontSize: 20)),
-                      pw.Text(
-                        _dateController.text,
-                        style: pw.TextStyle(fontSize: 12),
-                      ),
-                    ],
-                  ),
-                  pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                      children: [
-                        pw.Column(
-                            crossAxisAlignment: pw.CrossAxisAlignment.start,
-                            children: [
-                              pw.Text(
-                                'Supplier Aluminium',
-                                style: pw.TextStyle(fontSize: 12),
-                              ),
-                              pw.Text(
-                                'Aluminium Extrusion, Aluminium & \n Glass Accessories, Glass Work',
-                                style: pw.TextStyle(fontSize: 8),
-                              ),
-                              pw.Text(
-                                'HP/WA : 0812 5737 395 \nJL. Trans Kalimantan-Ambawang',
-                                style: pw.TextStyle(fontSize: 12),
-                              ),
-                            ]),
-                        pw.Center(
-                          child: pw.Text(
-                            'Invoice',
-                            style: pw.TextStyle(
-                                fontSize: 20, fontWeight: pw.FontWeight.bold),
-                          ),
-                        ),
-                        pw.Text(
-                          'No Nota: $noNota \nDitujukan kepada: $namaPembeli \nAlamat Pembeli: $alamatPembeli \nJenis Pembayaran: $pembayaran',
-                          style: pw.TextStyle(fontSize: 12),
-                        ),
-                      ])
-                ],
-              ),
-              pw.TableHelper.fromTextArray(
-                border: pw.TableBorder.all(),
-                headers: <String>['Nama', 'Warna', 'Harga', 'Jumlah', 'Total'],
-                data: selectedItems.map((item) {
-                  return <String>[
-                    item.name,
-                    item.warna,
-                    item.harga.toString(),
-                    item.jumlah.toString(),
-                    item.total.toString(),
-                  ];
-                }).toList(),
-              ),
-              pw.Align(
-                  alignment: pw.Alignment.topRight,
-                  child: pw.Text(
-                      'Grand Total: ${currencyFormat.format(grandTotal)}')),
-              pw.SizedBox(height: 20),
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  // Placeholder for first signature
-                  pw.Container(
-                    width: 200,
-                    height: 100,
-                    decoration: pw.BoxDecoration(
-                      border: pw.Border(
-                        bottom: pw.BorderSide(
-                          color: PdfColors.black,
-                          width: 1,
-                        ),
-                      ),
-                    ),
-                    child: pw.Center(child: pw.Text('TANDA TERIMA')),
-                  ),
-                  pw.Text(
-                    'PERHATIAN!!!\nBarang  yang sudah dibeli tidak\ndapat ditukar atau dikembalikan',
-                    style: pw.TextStyle(fontSize: 8),
-                  ),
-                  // Placeholder for second signature
-                  pw.Container(
-                    width: 200,
-                    height: 100,
-                    decoration: pw.BoxDecoration(
-                      border: pw.Border(
-                        bottom: pw.BorderSide(
-                          color: PdfColors.black,
-                          width: 1,
-                        ),
-                      ),
-                    ),
-                    child: pw.Center(child: pw.Text('HORMAT KAMI,')),
-                  ),
-                ],
-              ),
-            ],
-          );
-        },
-      ),
+
+    final pageTheme = pw.PageTheme(
+      pageFormat:
+          PdfPageFormat(9.5 * PdfPageFormat.inch, 5.5 * PdfPageFormat.inch),
+      margin: pw.EdgeInsets.zero,
     );
+
+    pw.Widget buildFooter(pw.Context context) {
+      return pw.Container(
+        alignment: pw.Alignment.center,
+        child: pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: pw.CrossAxisAlignment.end,
+          children: [
+            // Placeholder for first signature
+            pw.Container(
+              width: 200,
+              height: 50,
+              decoration: pw.BoxDecoration(
+                border: pw.Border(
+                  bottom: pw.BorderSide(
+                    color: PdfColors.black,
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: pw.Center(
+                  child: pw.Text('TANDA TERIMA',
+                      style: pw.TextStyle(fontSize: 10))),
+            ),
+            pw.Text(
+              'PERHATIAN!!!\nBarang  yang sudah dibeli tidak\ndapat ditukar atau dikembalikan',
+              style: pw.TextStyle(fontSize: 8),
+            ),
+            // Placeholder for second signature
+            pw.Container(
+              width: 200,
+              height: 50,
+              decoration: pw.BoxDecoration(
+                border: pw.Border(
+                  bottom: pw.BorderSide(
+                    color: PdfColors.black,
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: pw.Center(
+                  child: pw.Text('HORMAT KAMI,',
+                      style: pw.TextStyle(fontSize: 10))),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (selectedItems.length <= 12) {
+      pdf.addPage(
+        pw.MultiPage(
+          footer: buildFooter,
+          pageTheme: pageTheme,
+          build: (pw.Context context) {
+            return [
+              pw.Container(
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text('ProfilNium',
+                                style: pw.TextStyle(fontSize: 20)),
+                            pw.Text(
+                              'Pontianak, ${_dateController.text}',
+                              style: pw.TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                        pw.Row(
+                            mainAxisAlignment:
+                                pw.MainAxisAlignment.spaceBetween,
+                            children: [
+                              pw.Column(
+                                  crossAxisAlignment:
+                                      pw.CrossAxisAlignment.start,
+                                  children: [
+                                    pw.Text(
+                                      'Supplier Aluminium',
+                                      style: pw.TextStyle(fontSize: 12),
+                                    ),
+                                    pw.Text(
+                                      'Aluminium Extrusion, Aluminium & \n Glass Accessories, Glass Work',
+                                      style: pw.TextStyle(fontSize: 8),
+                                    ),
+                                    pw.Text(
+                                      'HP/WA : 0812 5737 395 \nJL. Trans Kalimantan-Ambawang',
+                                      style: pw.TextStyle(fontSize: 8),
+                                    ),
+                                  ]),
+                              pw.Center(
+                                child: pw.Text(
+                                  'Invoice',
+                                  style: pw.TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: pw.FontWeight.bold),
+                                ),
+                              ),
+                              pw.Text(
+                                'No Nota: $noNota \nKepada Yth. $namaPembeli \nAlamat Pembeli: $alamatPembeli \nJenis Pembayaran: $pembayaran',
+                                style: pw.TextStyle(fontSize: 10),
+                              ),
+                            ])
+                      ],
+                    ),
+                    pw.SizedBox(height: 5),
+                    pw.TableHelper.fromTextArray(
+                      columnWidths: {
+                        0: pw.FlexColumnWidth(
+                            4), // Adjusts width of the first column
+                        1: pw.FlexColumnWidth(
+                            1), // Adjusts width of the second column
+                        2: pw.FlexColumnWidth(
+                            1), // Adjusts width of the third column
+                        3: pw.FlexColumnWidth(
+                            1), // Adjusts width of the fourth column
+                        4: pw.FlexColumnWidth(
+                            1.5), // Adjusts width of the fifth column
+                      },
+                      border: pw.TableBorder.all(),
+                      headers: <String>[
+                        'Nama',
+                        'Jumlah',
+                        'Harga',
+                        'Disc',
+                        'Total',
+                      ],
+                      data: selectedItems.map((item) {
+                        return <String>[
+                          '${item.name} ${item.warna}',
+                          item.jumlah.toString(),
+                          item.harga.toString(),
+                          item.diskon.toString(),
+                          item.total.toString(),
+                        ];
+                      }).toList(),
+                      cellPadding: pw.EdgeInsets.all(2),
+                    ),
+                    pw.Align(
+                        alignment: pw.Alignment.topRight,
+                        child: pw.Text(
+                            'Total: ${currencyFormat.format(grandTotal)}')),
+                    pw.SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ];
+          },
+        ),
+      );
+    } else if (selectedItems.length <= 24) {
+      page1grandtotal = 0;
+      page2grandtotal = 0;
+      List<Item> page1 = selectedItems.take(12).toList();
+      List<Item> page2 = selectedItems.skip(12).toList();
+      for (Item satu in page1) {
+        page1grandtotal = page1grandtotal + satu.total;
+      }
+      for (Item dua in page2) {
+        page2grandtotal = page2grandtotal + dua.total;
+      }
+      pdf.addPage(
+        pw.MultiPage(
+          footer: buildFooter,
+          pageTheme: pageTheme,
+          build: (pw.Context context) {
+            return [
+              pw.Container(
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text('ProfilNium',
+                                style: pw.TextStyle(fontSize: 20)),
+                            pw.Text(
+                              'Pontianak, ${_dateController.text}',
+                              style: pw.TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                        pw.Row(
+                            mainAxisAlignment:
+                                pw.MainAxisAlignment.spaceBetween,
+                            children: [
+                              pw.Column(
+                                  crossAxisAlignment:
+                                      pw.CrossAxisAlignment.start,
+                                  children: [
+                                    pw.Text(
+                                      'Supplier Aluminium',
+                                      style: pw.TextStyle(fontSize: 12),
+                                    ),
+                                    pw.Text(
+                                      'Aluminium Extrusion, Aluminium & \n Glass Accessories, Glass Work',
+                                      style: pw.TextStyle(fontSize: 8),
+                                    ),
+                                    pw.Text(
+                                      'HP/WA : 0812 5737 395 \nJL. Trans Kalimantan-Ambawang',
+                                      style: pw.TextStyle(fontSize: 8),
+                                    ),
+                                  ]),
+                              pw.Center(
+                                child: pw.Text(
+                                  'Invoice',
+                                  style: pw.TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: pw.FontWeight.bold),
+                                ),
+                              ),
+                              pw.Text(
+                                'No Nota: $noNota \nKepada Yth. $namaPembeli \nAlamat Pembeli: $alamatPembeli \nJenis Pembayaran: $pembayaran',
+                                style: pw.TextStyle(fontSize: 10),
+                              ),
+                            ])
+                      ],
+                    ),
+                    pw.SizedBox(height: 5),
+                    pw.TableHelper.fromTextArray(
+                      columnWidths: {
+                        0: pw.FlexColumnWidth(
+                            4), // Adjusts width of the first column
+                        1: pw.FlexColumnWidth(
+                            1), // Adjusts width of the second column
+                        2: pw.FlexColumnWidth(
+                            1), // Adjusts width of the third column
+                        3: pw.FlexColumnWidth(
+                            1), // Adjusts width of the fourth column
+                        4: pw.FlexColumnWidth(
+                            1.5), // Adjusts width of the fifth column
+                      },
+                      border: pw.TableBorder.all(),
+                      headers: <String>[
+                        'Nama',
+                        'Jumlah',
+                        'Harga',
+                        'Disc',
+                        'Total',
+                      ],
+                      data: page1.map((item) {
+                        return <String>[
+                          '${item.name} ${item.warna}',
+                          item.jumlah.toString(),
+                          item.harga.toString(),
+                          item.diskon.toString(),
+                          item.total.toString(),
+                        ];
+                      }).toList(),
+                      cellPadding: pw.EdgeInsets.all(2),
+                    ),
+                    pw.Align(
+                        alignment: pw.Alignment.topRight,
+                        child: pw.Text(
+                            'Total: ${currencyFormat.format(page1grandtotal)}')),
+                    pw.SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ];
+          },
+        ),
+      );
+      pdf.addPage(
+        pw.MultiPage(
+          footer: buildFooter,
+          pageTheme: pageTheme,
+          build: (pw.Context context) {
+            return [
+              pw.Container(
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text('ProfilNium',
+                                style: pw.TextStyle(fontSize: 20)),
+                            pw.Text(
+                              'Pontianak, ${_dateController.text}',
+                              style: pw.TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                        pw.Row(
+                            mainAxisAlignment:
+                                pw.MainAxisAlignment.spaceBetween,
+                            children: [
+                              pw.Column(
+                                  crossAxisAlignment:
+                                      pw.CrossAxisAlignment.start,
+                                  children: [
+                                    pw.Text(
+                                      'Supplier Aluminium',
+                                      style: pw.TextStyle(fontSize: 12),
+                                    ),
+                                    pw.Text(
+                                      'Aluminium Extrusion, Aluminium & \n Glass Accessories, Glass Work',
+                                      style: pw.TextStyle(fontSize: 8),
+                                    ),
+                                    pw.Text(
+                                      'HP/WA : 0812 5737 395 \nJL. Trans Kalimantan-Ambawang',
+                                      style: pw.TextStyle(fontSize: 8),
+                                    ),
+                                  ]),
+                              pw.Center(
+                                child: pw.Text(
+                                  'Invoice',
+                                  style: pw.TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: pw.FontWeight.bold),
+                                ),
+                              ),
+                              pw.Text(
+                                'No Nota: $noNota \nKepada Yth. $namaPembeli \nAlamat Pembeli: $alamatPembeli \nJenis Pembayaran: $pembayaran',
+                                style: pw.TextStyle(fontSize: 10),
+                              ),
+                            ])
+                      ],
+                    ),
+                    pw.SizedBox(height: 5),
+                    pw.TableHelper.fromTextArray(
+                      columnWidths: {
+                        0: pw.FlexColumnWidth(
+                            4), // Adjusts width of the first column
+                        1: pw.FlexColumnWidth(
+                            1), // Adjusts width of the second column
+                        2: pw.FlexColumnWidth(
+                            1), // Adjusts width of the third column
+                        3: pw.FlexColumnWidth(
+                            1), // Adjusts width of the fourth column
+                        4: pw.FlexColumnWidth(
+                            1.5), // Adjusts width of the fifth column
+                      },
+                      border: pw.TableBorder.all(),
+                      headers: <String>[
+                        'Nama',
+                        'Jumlah',
+                        'Harga',
+                        'Disc',
+                        'Total',
+                      ],
+                      data: page2.map((item) {
+                        return <String>[
+                          '${item.name} ${item.warna}',
+                          item.jumlah.toString(),
+                          item.harga.toString(),
+                          item.diskon.toString(),
+                          item.total.toString(),
+                        ];
+                      }).toList(),
+                      cellPadding: pw.EdgeInsets.all(2),
+                    ),
+                    pw.Align(
+                        alignment: pw.Alignment.topRight,
+                        child: pw.Text(
+                            'Total: ${currencyFormat.format(page2grandtotal)}')),
+                    pw.SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ];
+          },
+        ),
+      );
+    } else {
+      page1grandtotal = 0;
+      page2grandtotal = 0;
+      page3grandtotal = 0;
+      List<Item> page1 = selectedItems.take(12).toList();
+      List<Item> page2 = selectedItems.skip(12).take(12).toList();
+      List<Item> page3 = selectedItems.skip(24).take(12).toList();
+      for (Item satu in page1) {
+        page1grandtotal = page1grandtotal + satu.total;
+      }
+      for (Item dua in page2) {
+        page2grandtotal = page2grandtotal + dua.total;
+      }
+      for (Item tiga in page3) {
+        page3grandtotal = page3grandtotal + tiga.total;
+      }
+      pdf.addPage(
+        pw.MultiPage(
+          footer: buildFooter,
+          pageTheme: pageTheme,
+          build: (pw.Context context) {
+            return [
+              pw.Container(
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text('ProfilNium',
+                                style: pw.TextStyle(fontSize: 20)),
+                            pw.Text(
+                              'Pontianak, ${_dateController.text}',
+                              style: pw.TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                        pw.Row(
+                            mainAxisAlignment:
+                                pw.MainAxisAlignment.spaceBetween,
+                            children: [
+                              pw.Column(
+                                  crossAxisAlignment:
+                                      pw.CrossAxisAlignment.start,
+                                  children: [
+                                    pw.Text(
+                                      'Supplier Aluminium',
+                                      style: pw.TextStyle(fontSize: 12),
+                                    ),
+                                    pw.Text(
+                                      'Aluminium Extrusion, Aluminium & \n Glass Accessories, Glass Work',
+                                      style: pw.TextStyle(fontSize: 8),
+                                    ),
+                                    pw.Text(
+                                      'HP/WA : 0812 5737 395 \nJL. Trans Kalimantan-Ambawang',
+                                      style: pw.TextStyle(fontSize: 8),
+                                    ),
+                                  ]),
+                              pw.Center(
+                                child: pw.Text(
+                                  'Invoice',
+                                  style: pw.TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: pw.FontWeight.bold),
+                                ),
+                              ),
+                              pw.Text(
+                                'No Nota: $noNota \nKepada Yth. $namaPembeli \nAlamat Pembeli: $alamatPembeli \nJenis Pembayaran: $pembayaran',
+                                style: pw.TextStyle(fontSize: 10),
+                              ),
+                            ])
+                      ],
+                    ),
+                    pw.SizedBox(height: 5),
+                    pw.TableHelper.fromTextArray(
+                      columnWidths: {
+                        0: pw.FlexColumnWidth(
+                            4), // Adjusts width of the first column
+                        1: pw.FlexColumnWidth(
+                            1), // Adjusts width of the second column
+                        2: pw.FlexColumnWidth(
+                            1), // Adjusts width of the third column
+                        3: pw.FlexColumnWidth(
+                            1), // Adjusts width of the fourth column
+                        4: pw.FlexColumnWidth(
+                            1.5), // Adjusts width of the fifth column
+                      },
+                      border: pw.TableBorder.all(),
+                      headers: <String>[
+                        'Nama',
+                        'Jumlah',
+                        'Harga',
+                        'Disc',
+                        'Total',
+                      ],
+                      data: page1.map((item) {
+                        return <String>[
+                          '${item.name} ${item.warna}',
+                          item.jumlah.toString(),
+                          item.harga.toString(),
+                          item.diskon.toString(),
+                          item.total.toString(),
+                        ];
+                      }).toList(),
+                      cellPadding: pw.EdgeInsets.all(2),
+                    ),
+                    pw.Align(
+                        alignment: pw.Alignment.topRight,
+                        child: pw.Text(
+                            'Total: ${currencyFormat.format(page1grandtotal)}')),
+                    pw.SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ];
+          },
+        ),
+      );
+      pdf.addPage(
+        pw.MultiPage(
+          footer: buildFooter,
+          pageTheme: pageTheme,
+          build: (pw.Context context) {
+            return [
+              pw.Container(
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text('ProfilNium',
+                                style: pw.TextStyle(fontSize: 20)),
+                            pw.Text(
+                              'Pontianak, ${_dateController.text}',
+                              style: pw.TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                        pw.Row(
+                            mainAxisAlignment:
+                                pw.MainAxisAlignment.spaceBetween,
+                            children: [
+                              pw.Column(
+                                  crossAxisAlignment:
+                                      pw.CrossAxisAlignment.start,
+                                  children: [
+                                    pw.Text(
+                                      'Supplier Aluminium',
+                                      style: pw.TextStyle(fontSize: 12),
+                                    ),
+                                    pw.Text(
+                                      'Aluminium Extrusion, Aluminium & \n Glass Accessories, Glass Work',
+                                      style: pw.TextStyle(fontSize: 8),
+                                    ),
+                                    pw.Text(
+                                      'HP/WA : 0812 5737 395 \nJL. Trans Kalimantan-Ambawang',
+                                      style: pw.TextStyle(fontSize: 8),
+                                    ),
+                                  ]),
+                              pw.Center(
+                                child: pw.Text(
+                                  'Invoice',
+                                  style: pw.TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: pw.FontWeight.bold),
+                                ),
+                              ),
+                              pw.Text(
+                                'No Nota: $noNota \nKepada Yth. $namaPembeli \nAlamat Pembeli: $alamatPembeli \nJenis Pembayaran: $pembayaran',
+                                style: pw.TextStyle(fontSize: 10),
+                              ),
+                            ])
+                      ],
+                    ),
+                    pw.SizedBox(height: 5),
+                    pw.TableHelper.fromTextArray(
+                      columnWidths: {
+                        0: pw.FlexColumnWidth(
+                            4), // Adjusts width of the first column
+                        1: pw.FlexColumnWidth(
+                            1), // Adjusts width of the second column
+                        2: pw.FlexColumnWidth(
+                            1), // Adjusts width of the third column
+                        3: pw.FlexColumnWidth(
+                            1), // Adjusts width of the fourth column
+                        4: pw.FlexColumnWidth(
+                            1.5), // Adjusts width of the fifth column
+                      },
+                      border: pw.TableBorder.all(),
+                      headers: <String>[
+                        'Nama',
+                        'Jumlah',
+                        'Harga',
+                        'Disc',
+                        'Total',
+                      ],
+                      data: page2.map((item) {
+                        return <String>[
+                          '${item.name} ${item.warna}',
+                          item.jumlah.toString(),
+                          item.harga.toString(),
+                          item.diskon.toString(),
+                          item.total.toString(),
+                        ];
+                      }).toList(),
+                      cellPadding: pw.EdgeInsets.all(2),
+                    ),
+                    pw.Align(
+                        alignment: pw.Alignment.topRight,
+                        child: pw.Text(
+                            'Total: ${currencyFormat.format(page2grandtotal)}')),
+                    pw.SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ];
+          },
+        ),
+      );
+      pdf.addPage(
+        pw.MultiPage(
+          footer: buildFooter,
+          pageTheme: pageTheme,
+          build: (pw.Context context) {
+            return [
+              pw.Container(
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text('ProfilNium',
+                                style: pw.TextStyle(fontSize: 20)),
+                            pw.Text(
+                              'Pontianak, ${_dateController.text}',
+                              style: pw.TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                        pw.Row(
+                            mainAxisAlignment:
+                                pw.MainAxisAlignment.spaceBetween,
+                            children: [
+                              pw.Column(
+                                  crossAxisAlignment:
+                                      pw.CrossAxisAlignment.start,
+                                  children: [
+                                    pw.Text(
+                                      'Supplier Aluminium',
+                                      style: pw.TextStyle(fontSize: 12),
+                                    ),
+                                    pw.Text(
+                                      'Aluminium Extrusion, Aluminium & \n Glass Accessories, Glass Work',
+                                      style: pw.TextStyle(fontSize: 8),
+                                    ),
+                                    pw.Text(
+                                      'HP/WA : 0812 5737 395 \nJL. Trans Kalimantan-Ambawang',
+                                      style: pw.TextStyle(fontSize: 8),
+                                    ),
+                                  ]),
+                              pw.Center(
+                                child: pw.Text(
+                                  'Invoice',
+                                  style: pw.TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: pw.FontWeight.bold),
+                                ),
+                              ),
+                              pw.Text(
+                                'No Nota: $noNota \nKepada Yth. $namaPembeli \nAlamat Pembeli: $alamatPembeli \nJenis Pembayaran: $pembayaran',
+                                style: pw.TextStyle(fontSize: 10),
+                              ),
+                            ])
+                      ],
+                    ),
+                    pw.SizedBox(height: 5),
+                    pw.TableHelper.fromTextArray(
+                      columnWidths: {
+                        0: pw.FlexColumnWidth(
+                            4), // Adjusts width of the first column
+                        1: pw.FlexColumnWidth(
+                            1), // Adjusts width of the second column
+                        2: pw.FlexColumnWidth(
+                            1), // Adjusts width of the third column
+                        3: pw.FlexColumnWidth(
+                            1), // Adjusts width of the fourth column
+                        4: pw.FlexColumnWidth(
+                            1.5), // Adjusts width of the fifth column
+                      },
+                      border: pw.TableBorder.all(),
+                      headers: <String>[
+                        'Nama',
+                        'Jumlah',
+                        'Harga',
+                        'Disc',
+                        'Total',
+                      ],
+                      data: page3.map((item) {
+                        return <String>[
+                          '${item.name} ${item.warna}',
+                          item.jumlah.toString(),
+                          item.harga.toString(),
+                          item.diskon.toString(),
+                          item.total.toString(),
+                        ];
+                      }).toList(),
+                      cellPadding: pw.EdgeInsets.all(2),
+                    ),
+                    pw.Align(
+                        alignment: pw.Alignment.topRight,
+                        child: pw.Text(
+                            'Total: ${currencyFormat.format(page3grandtotal)}')),
+                    pw.SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ];
+          },
+        ),
+      );
+    }
+
     final output = await getTemporaryDirectory();
     final file = File('${output.path}/invoice.pdf');
     await file.writeAsBytes(await pdf.save());
@@ -253,7 +858,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
       }
     }
     for (Item sold in selectedItems) {
-      grandTotal = grandTotal + sold.total;
+      grandTotal = grandTotal + sold.total - sold.diskon;
       int sisaStok = sold.sisaStokDb - sold.jumlah;
       await Firestore.instance
           .collection('data')
@@ -265,7 +870,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
       'Nomor': nomor.text,
       'Nama': nama.text,
       'Alamat': alamat.text,
-      'Tanggal': _dateController.text,
+      'Tanggal': DateFormat('yyyy-MM-dd').format(_selectedDate),
       'Pembayaran': _selectedItem,
       'JenisTerjual': selectedItems.length,
       'grandTotal': grandTotal,
@@ -327,6 +932,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
     data.asMap().forEach((index, e) {
       invoiceData['IdBarang$index'] = e.id;
       invoiceData['JumlahTerjual$index'] = e.jumlah;
+      invoiceData['diskon$index'] = e.diskon;
       invoiceData['HargaJual$index'] = e.harga;
     });
     await Firestore.instance.document('invoice/$id').set(invoiceData);
@@ -347,7 +953,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
       nama.clear();
       alamat.clear();
       _controller.clear();
-      jumlahTerjual.clear();
+      diskon.clear();
     });
   }
 
@@ -610,9 +1216,8 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                           ),
                                           onTap: () {
                                             setState(() {
-                                              if (selectedItems.length < 12 &&
-                                                  !selectedItems.contains(
-                                                      searchResults[index])) {
+                                              if (!selectedItems.contains(
+                                                  searchResults[index])) {
                                                 selectedItems
                                                     .add(searchResults[index]);
                                                 searchResults.remove(
@@ -625,7 +1230,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                                     .showSnackBar(
                                                   SnackBar(
                                                     content: Text(
-                                                        'Maximum limit of 12 entries reached'),
+                                                        'Barang ini sudah ditambahkan'),
                                                   ),
                                                 );
                                               }
@@ -678,9 +1283,10 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                             columns: [
                               DataColumn(label: Text('Nama')),
                               DataColumn(label: Text('Warna')),
-                              DataColumn(label: Text('Harga')),
                               DataColumn(label: Text('Sisa Stok')),
                               DataColumn(label: Text('Jumlah')),
+                              DataColumn(label: Text('Harga')),
+                              DataColumn(label: Text('Diskon')),
                               DataColumn(label: Text('Total')),
                               DataColumn(label: Text('Hapus')),
                             ],
@@ -689,7 +1295,6 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                   (item) => DataRow(cells: [
                                     DataCell(Text(item.name)),
                                     DataCell(Text(item.warna)),
-                                    DataCell(Text(item.harga.toString())),
                                     DataCell(Text(item.sisaStokDb.toString())),
                                     DataCell(
                                       TextFormField(
@@ -703,7 +1308,27 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
                                             item.jumlah =
                                                 int.tryParse(newValue) ?? 1;
                                             item.total =
-                                                item.jumlah * item.harga;
+                                                item.jumlah * item.harga -
+                                                    item.diskon;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    DataCell(Text(item.harga.toString())),
+                                    DataCell(
+                                      TextFormField(
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: <TextInputFormatter>[
+                                          FilteringTextInputFormatter.allow(
+                                              RegExp(r'[0-9]')),
+                                        ],
+                                        onChanged: (newValue) {
+                                          setState(() {
+                                            item.diskon =
+                                                int.tryParse(newValue) ?? 0;
+                                            item.total =
+                                                item.jumlah * item.harga -
+                                                    item.diskon;
                                           });
                                         },
                                       ),
