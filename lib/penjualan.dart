@@ -858,7 +858,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
       }
     }
     for (Item sold in selectedItems) {
-      grandTotal = grandTotal + sold.total - sold.diskon;
+      grandTotal = grandTotal + sold.total;
       int sisaStok = sold.sisaStokDb - sold.jumlah;
       await Firestore.instance
           .collection('data')
@@ -908,7 +908,7 @@ class _FragmentPenjualan extends State<FragmentPenjualan> {
       'Nomor': nomor.text,
       'Nama': nama.text,
       'Alamat': alamat.text,
-      'Tanggal': _dateController.text,
+      'Tanggal': DateFormat('yyyy-MM-dd').format(_selectedDate),
       'Pembayaran': _selectedItem,
       'JenisTerjual': selectedItems.length,
       'grandTotal': grandTotal,
